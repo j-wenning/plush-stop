@@ -26,7 +26,7 @@ export default class ProductList extends React.Component {
       p => <ProductListItem key={p.productId} product={p}/>
     );
     return (
-      <div className="container card-columns">
+      <div className="container card-columns product-list">
         {this.state.error ? <h2>Error: {this.state.message}</h2> : products}
       </div>
     );
