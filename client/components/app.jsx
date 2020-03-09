@@ -1,11 +1,23 @@
 import React from 'react';
 import Navbar from './navbar';
 import ProductList from './product-list';
+import ProductDetails from './product-details';
 
 export default class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { error: '', isLoading: true };
+    this.state = {
+      error: '',
+      isLoading: true,
+      view: {
+        name: 'catalog',
+        params: {}
+      }
+    };
+  }
+
+  setView(name, params) {
+    this.setState({ name, params });
   }
 
   componentDidMount() {
@@ -15,6 +27,19 @@ export default class App extends React.Component {
   }
 
   render() {
+    let view;
+    switch (this.state.view.name) {
+      case 'catalog':
+      case 'catalogue':
+        view = <ProductList setView={params => this.setView('details', params)} />;
+        break;
+      case 'details':
+        view = <ProductDetails />;
+        break;
+      default:
+        this.setState({ error: 'An unexpected error has occured.' });
+        return;
+    }
     return this.state.isLoading
       ? <h1>Loading ...</h1>
       : (
@@ -23,7 +48,7 @@ export default class App extends React.Component {
           {
             this.state.error
               ? <h2>{this.state.error}</h2>
-              : <ProductList />
+              : view
           }
         </div>
 
