@@ -26,10 +26,8 @@ export default class ProductList extends React.Component {
       p => <ProductListItem key={p.productId} product={p}/>
     );
     return (
-      <div className="container">
-        <div className="card-columns">
-          {products}
-        </div>
+      <div className="container card-columns">
+        {products}
       </div>
     );
   }

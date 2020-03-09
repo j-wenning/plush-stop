@@ -1,11 +1,11 @@
 import React from 'react';
 
-export default class Product extends React.Component {
+export default class ProductListItem extends React.Component {
   render() {
     return (
       <div className="card">
         <div className="card-body">
-          <img src={this.props.product.image} className="card-img-top" alt=""/>
+          <img src={this.props.product.image} className="card-img-top img-fluid" alt=""/>
           <h5 className="card-title">
             {this.props.product.name}
           </h5>
