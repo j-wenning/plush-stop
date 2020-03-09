@@ -27,7 +27,7 @@ export default class ProductList extends React.Component {
     );
     return (
       <div className="container card-columns">
-        {products}
+        {this.state.error ? products : <h2>Error: {this.state.message}</h2>}
       </div>
     );
   }
