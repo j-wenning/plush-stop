@@ -52,7 +52,7 @@ app.post('/api/cart', (req, res, next) => {
   const pid = Number(req.body.productId);
   const cid = Number(req.body.cartId);
   if (!pid || pid <= 0) throw new ClientError(`Product id ${pid} is invalid`, 400);
-  else if (cid && cid <= 0) throw new ClientError(`Cart id ${cid} is invalid`, 400);
+  else if (!cid || cid <= 0) throw new ClientError(`Cart id ${cid} is invalid`, 400);
   else {
     db.query(`
       SELECT "price"
