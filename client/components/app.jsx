@@ -46,7 +46,7 @@ export default class App extends React.Component {
   componentDidMount() {
     fetch('/api/health-check')
       .catch(err => this.setState({ message: err.message }))
-      .then(this.getCartItems())
+      .then(() => this.getCartItems())
       .finally(() => this.setState({ isLoading: false }));
   }
 
