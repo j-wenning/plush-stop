@@ -4,7 +4,7 @@ export default class Header extends React.Component {
   render() {
     return (
       <div className="navbar navbar-dark bg-dark mb-4">
-        <a href="#" className="navbar-brand col">
+        <a href="" className="navbar-brand col">
           <h2 className="col">
             <i className="fas fa-dollar-sign" /> Wicked Sales
           </h2>

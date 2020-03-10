@@ -17,6 +17,10 @@ export default class App extends React.Component {
     };
   }
 
+  setView(name, params) {
+    this.setState({ view: { name, params } });
+  }
+
   getCartItems() {
     fetch('/api/cart')
       .then(res => res.json())
@@ -25,8 +29,18 @@ export default class App extends React.Component {
       }));
   }
 
-  setView(name, params) {
-    this.setState({ view: { name, params } });
+  addToCart(product) {
+    fetch('/api/cart', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ productId: Number(product.productId) })
+    })
+      .then(res => res.json())
+      .then(data => this.setState({
+        cart: [...this.state.cart, data]
+      }));
   }
 
   componentDidMount() {
@@ -41,10 +55,14 @@ export default class App extends React.Component {
     switch (this.state.view.name) {
       case 'catalog':
       case 'catalogue':
-        view = <ProductList setView={params => this.setView('details', params)} />;
+        view = <ProductList
+          setView={params => this.setView('details', params)}/>;
         break;
       case 'details':
-        view = <ProductDetails setView={() => this.setView('catalog', {})} productId={this.state.view.params.productId}/>;
+        view = <ProductDetails
+          setView={() => this.setView('catalog', {})}
+          productId={this.state.view.params.productId}
+          addToCart={productId => this.addToCart(productId)}/>;
         break;
       default:
         this.setState({ error: 'An unexpected error has occured.' });
