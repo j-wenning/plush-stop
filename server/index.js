@@ -50,9 +50,7 @@ app.get('/api/products/:id', (req, res, next) => {
 
 app.post('/api/cart', (req, res, next) => {
   const pid = Number(req.body.productId);
-  const cid = Number(req.body.cartId);
   if (!pid || pid <= 0) throw new ClientError(`Product id ${pid} is invalid`, 400);
-  else if (!cid || cid <= 0) throw new ClientError(`Cart id ${cid} is invalid`, 400);
   else {
     db.query(`
       SELECT "price"
@@ -62,24 +60,21 @@ app.post('/api/cart', (req, res, next) => {
       .then(result => {
         const row = result.rows[0];
         if (!row) throw new ClientError(`Product does not exist at id: ${pid}`, 404);
-        if (cid) { // asserting cid is valid
-          return db.query(`
-            SELECT "carts"."cartId",
-                   $2 AS "price"
-              FROM "carts"
-             WHERE "cartId" = $1;
-          `, [cid, row.price]);
-        } else {
-          return db.query(`
+        if (req.session.cartId) {
+          return {
+            cartId: req.session.cartId,
+            price: row.price
+          };
+        }
+        return db.query(`
             INSERT INTO "carts" ("cartId", "createdAt")
                  VALUES (DEFAULT, DEFAULT)
               RETURNING "cartId", $1 AS "price";
           `, [row.price]);
-        }
       })
       .then(result => {
-        const row = result.rows[0];
-        if (!row) throw new ClientError(`Cart does not exist at id: ${cid}`, 404);
+        const row = result.rows ? result.rows[0] : result;
+        req.session.cartId = row.cartId;
         return db.query(`
           INSERT INTO "cartItems" ("cartId", "productId", "price")
                VALUES ($1, $2, $3)
@@ -88,44 +83,54 @@ app.post('/api/cart', (req, res, next) => {
       })
       .then(result => {
         const row = result.rows[0];
-        return db.query(`
-          SELECT "c"."cartItemId",
-                 "c"."price",
-                 "p"."productId",
-                 "p"."image",
-                 "p"."name",
-                 "p"."shortDescription"
-            FROM "cartItems" AS "c"
-            JOIN "products" AS "p" USING ("productId")
-           WHERE "c"."cartItemId" = $1
-        `, [row.cartItemId]);
+        return fetch('/api/cart', {
+          body: JSON.stringify({ productId: row })
+        });
       })
       .then(result => {
-        res.json(result.rows[0]).send(201);
+        res.json(result.rows).send(201);
       })
       .catch(err => next(err));
   }
 });
 
 app.get('/api/cart', (req, res, next) => {
-  const cid = (req.body.cartId);
-  if (!cid || cid <= 0) throw new ClientError(`Cart id ${cid} is invalid`, 400);
-  db.query(`
-    SELECT "c"."cartItemId",
-           "c"."price",
-           "p"."productId",
-           "p"."image",
-           "p"."name",
-           "p"."shortDescription"
-      FROM "cartItems" AS "c"
-      JOIN "products" AS "p" USING ("productId")
-     WHERE "cartId" = $1;
-  `, [cid])
-    .then(result => {
-      if (result.rows.length === 0) throw new ClientError(`Cart does not exist/is empty at id: ${cid}`, 404);
-      res.json(result.rows);
-    })
-    .catch(err => next(err));
+  const cid = req.session.cartId;
+  const ciid = req.body.cartItemId;
+  let query;
+  if (!cid) res.json([]);
+  else {
+    if (ciid) {
+      query = () => db.query(`
+        SELECT "c"."cartItemId",
+               "c"."price",
+               "p"."productId",
+               "p"."image",
+               "p"."name",
+               "p"."shortDescription"
+          FROM "cartItems" AS "c"
+          JOIN "products" AS "p" USING ("productId")
+         WHERE "cartId" = $1 AND "cartItemId" = $2;
+      `, [cid, ciid]);
+    } else {
+      query = () => db.query(`
+        SELECT "c"."cartItemId",
+               "c"."price",
+               "p"."productId",
+               "p"."image",
+               "p"."name",
+               "p"."shortDescription"
+          FROM "cartItems" AS "c"
+          JOIN "products" AS "p" USING ("productId")
+         WHERE "cartId" = $1;
+    `, [cid]);
+    }
+    query()
+      .then(result => {
+        res.json(result.rows);
+      })
+      .catch(err => next(err));
+  }
 });
 
 app.use('/api', (req, res, next) => {
