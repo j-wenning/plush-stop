@@ -1,5 +1,5 @@
 import React from 'react';
-import Navbar from './navbar';
+import Header from './header';
 import ProductList from './product-list';
 import ProductDetails from './product-details';
 
@@ -12,8 +12,17 @@ export default class App extends React.Component {
       view: {
         name: 'catalog',
         params: {}
-      }
+      },
+      cart: []
     };
+  }
+
+  getCartItems() {
+    fetch('/api/cart')
+      .then(res => res.json())
+      .then(data => this.setState({
+        cart: data
+      }));
   }
 
   setView(name, params) {
@@ -23,6 +32,7 @@ export default class App extends React.Component {
   componentDidMount() {
     fetch('/api/health-check')
       .catch(err => this.setState({ message: err.message }))
+      .then(this.getCartItems())
       .finally(() => this.setState({ isLoading: false }));
   }
 
@@ -44,7 +54,7 @@ export default class App extends React.Component {
       ? <h1>Loading ...</h1>
       : (
         <div>
-          <Navbar/>
+          <Header/>
           {
             this.state.error
               ? <h2>{this.state.error}</h2>
