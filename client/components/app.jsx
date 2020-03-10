@@ -17,7 +17,7 @@ export default class App extends React.Component {
   }
 
   setView(name, params) {
-    this.setState({ name, params });
+    this.setState({ view: { name, params } });
   }
 
   componentDidMount() {
@@ -34,7 +34,7 @@ export default class App extends React.Component {
         view = <ProductList setView={params => this.setView('details', params)} />;
         break;
       case 'details':
-        view = <ProductDetails />;
+        view = <ProductDetails setView={() => this.setView('catalog', {})} productId={this.state.view.params.productId}/>;
         break;
       default:
         this.setState({ error: 'An unexpected error has occured.' });

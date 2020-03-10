@@ -7,7 +7,6 @@ export default class ProductDetails extends React.Component {
   }
 
   getProduct(id) {
-    id = 1;
     fetch('api/products/' + id)
       .then(req => req.json())
       .then(data => this.setState({ product: data }))
@@ -28,7 +27,7 @@ export default class ProductDetails extends React.Component {
         <div className="card p-4">
           <div className="row">
             <div className="col mb-3">
-              <a href="#" onClick={''} className="text-secondary">{'< Back to catalog'}</a>
+              <a onClick={this.props.setView} className="text-secondary">{'< Back to catalog'}</a>
             </div>
           </div>
           <div className="row">
