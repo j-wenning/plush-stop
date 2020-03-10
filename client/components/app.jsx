@@ -54,7 +54,7 @@ export default class App extends React.Component {
       ? <h1>Loading ...</h1>
       : (
         <div>
-          <Header/>
+          <Header cartItemCount={this.state.cart.length}/>
           {
             this.state.error
               ? <h2>{this.state.error}</h2>
