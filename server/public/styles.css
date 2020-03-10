@@ -1,8 +1,19 @@
-.card-img-top {
-  height: 225px;
+a:hover {
+  cursor: pointer;
+}
+
+img {
   object-fit: contain;
 }
 
-.card {
+.product-details img {
   height: 400px;
+}
+
+.product-list-item {
+  height: 400px;
+}
+
+.product-list-item img {
+  height: 225px;
 }
