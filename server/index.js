@@ -33,7 +33,7 @@ app.get('/api/products', (req, res, next) => {
 
 app.get('/api/products/:id', (req, res, next) => {
   const id = req.params.id;
-  if (id <= 0) throw new ClientError(`Id ${id} is invalid`, 400);
+  if (id <= 0) throw new ClientError(`Product id ${id} is invalid`, 400);
   else {
     db.query(`
       SELECT *
@@ -46,13 +46,6 @@ app.get('/api/products/:id', (req, res, next) => {
         else res.json(row);
       }).catch(err => next(err));
   }
-});
-
-app.get('/api/cart', (req, res, next) => {
-  // db.query(`
-  // `).then(result => res.json(result.rows))
-  //   .catch(err => next(err));
-  res.json();
 });
 
 app.post('/api/cart', (req, res, next) => {
@@ -112,6 +105,27 @@ app.post('/api/cart', (req, res, next) => {
       })
       .catch(err => next(err));
   }
+});
+
+app.get('/api/cart', (req, res, next) => {
+  const cid = (req.body.cartId);
+  if (!cid || cid <= 0) throw new ClientError(`Cart id ${cid} is invalid`, 400);
+  db.query(`
+    SELECT "c"."cartItemId",
+           "c"."price",
+           "p"."productId",
+           "p"."image",
+           "p"."name",
+           "p"."shortDescription"
+      FROM "cartItems" AS "c"
+      JOIN "products" AS "p" USING ("productId")
+     WHERE "cartId" = $1;
+  `, [cid])
+    .then(result => {
+      if (result.rows.length === 0) throw new ClientError(`Cart does not exist/is empty at id: ${cid}`, 404);
+      res.json(result.rows);
+    })
+    .catch(err => next(err));
 });
 
 app.use('/api', (req, res, next) => {
