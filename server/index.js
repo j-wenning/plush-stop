@@ -106,10 +106,12 @@ app.post('/api/cart', (req, res, next) => {
 app.get('/api/cart', (req, res, next) => {
   const cid = req.session.cartId;
   const ciid = req.body.cartItemId;
+  let query;
   if (!cid) res.json([]);
   else if (ciid && (!Number(ciid) || ciid <= 0)) throw new ClientError(`Cart item id ${ciid} is invalid`, 400);
   else {
-    db.query(`
+    if (ciid) {
+      query = () => db.query(`
         SELECT "c"."cartItemId",
                "c"."price",
                "p"."productId",
@@ -118,8 +120,22 @@ app.get('/api/cart', (req, res, next) => {
                "p"."shortDescription"
           FROM "cartItems" AS "c"
           JOIN "products" AS "p" USING ("productId")
-         WHERE ${ciid ? '"cartItemId"' : '"cartId"'} = $1;
-    `, [ciid || cid])
+         WHERE "cartItemId" = $1 AND "cartId" = $2;
+    `, [ciid, cid]);
+    } else {
+      query = () => db.query(`
+        SELECT "c"."cartItemId",
+               "c"."price",
+               "p"."productId",
+               "p"."image",
+               "p"."name",
+               "p"."shortDescription"
+          FROM "cartItems" AS "c"
+          JOIN "products" AS "p" USING ("productId")
+         WHERE "cartId" = $1;
+    `, [cid]);
+    }
+    query()
       .then(result => {
         res.json(result.rows);
       })
