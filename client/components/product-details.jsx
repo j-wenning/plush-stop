@@ -34,7 +34,7 @@ export default class ProductDetails extends React.Component {
             <img src={this.state.product.image} className="img-fluid col-5" alt=""/>
             <div className="col-7">
               <h2>{this.state.product.name}</h2>
-              <h3 className="text-secondary">{'$' + (this.state.product.price / 100).toFixed(2)}</h3>
+              <h3 className="text-secondary">${(this.state.product.price / 100).toFixed(2)}</h3>
               <p>{this.state.product.shortDescription}</p>
               <button
                 type="button"

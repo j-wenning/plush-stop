@@ -106,7 +106,8 @@ app.post('/api/cart', (req, res, next) => {
 app.get('/api/cart', (req, res, next) => {
   const cid = req.session.cartId;
   if (!cid) res.json([]);
-  db.query(`
+  else {
+    db.query(`
     SELECT "c"."cartItemId",
            "c"."price",
            "p"."productId",
@@ -117,10 +118,11 @@ app.get('/api/cart', (req, res, next) => {
       JOIN "products" AS "p" USING ("productId")
      WHERE "cartId" = $1;
   `, [cid])
-    .then(result => {
-      res.json(result.rows);
-    })
-    .catch(err => next(err));
+      .then(result => {
+        res.json(result.rows);
+      })
+      .catch(err => next(err));
+  }
 });
 
 app.post('/api/orders', (req, res, next) => {
@@ -131,16 +133,19 @@ app.post('/api/orders', (req, res, next) => {
   else if (!name) throw new ClientError('Name required', 400);
   else if (!creditCard) throw new ClientError('Credit card required', 400);
   else if (!shippingAddress) throw new ClientError('Shipping address required', 400);
-  db.query(`
+  else {
+    db.query(`
     INSERT INTO "orders" ("cartId", "name", "creditCard", "shippingAddress")
          VALUES ($1, $2, $3, $4)
       RETURNING *;
   `, [cid, name, creditCard, shippingAddress])
-    .then(result => {
-      delete session.cartId;
-      res.status(201).json(result.rows[0]);
-    })
-    .catch(err => next(err));
+      .then(result => {
+        session.cartId = null;
+        delete session.cartId;
+        res.status(201).json(result.rows[0]);
+      })
+      .catch(err => next(err));
+  }
 });
 
 app.use('/api', (req, res, next) => {

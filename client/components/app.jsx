@@ -28,7 +28,8 @@ export default class App extends React.Component {
       .then(res => res.json())
       .then(data => this.setState({
         cart: data
-      }));
+      }))
+      .catch(err => console.error(err));
   }
 
   addToCart(product) {
@@ -42,7 +43,21 @@ export default class App extends React.Component {
       .then(res => res.json())
       .then(data => this.setState({
         cart: [...this.state.cart, data]
-      }));
+      }))
+      .catch(err => console.error(err));
+  }
+
+  placeOrder(order) {
+    fetch('/api/orders', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(order)
+    })
+      .then(res => res.json())
+      .then(() => this.getCartItems())
+      .catch(err => console.error(err));
   }
 
   componentDidMount() {
@@ -68,13 +83,15 @@ export default class App extends React.Component {
         break;
       case 'cart':
         view = <CartSummary
-          setView={() => this.setView('catalog', {})}
+          viewCatalog={() => this.setView('catalog', {})}
+          viewCheckout={() => this.setView('checkout', {})}
           cart={this.state.cart}/>;
         break;
       case 'checkout':
         view = <CheckoutForm
           setView={() => this.setView('catalog', {})}
-          placeOrder={''}/>;
+          placeOrder={order => this.placeOrder(order)}
+          cart={this.state.cart}/>;
         break;
       default:
         this.setState({ error: 'An unexpected error has occured.' });
