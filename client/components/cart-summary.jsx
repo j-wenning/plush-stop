@@ -28,6 +28,9 @@ export default class CartSummary extends React.Component {
           <div className="col">
             <h2>Item total: ${(total / 100).toFixed(2)}</h2>
           </div>
+          <div className="col text-right">
+            <button onClick={''} className="btn btn-primary">Checkout</button>
+          </div>
         </div>
       </div>
     );
