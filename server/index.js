@@ -125,6 +125,7 @@ app.get('/api/cart', (req, res, next) => {
 
 app.post('/api/orders', (req, res, next) => {
   const cid = req.session.cartId;
+  const session = req.session;
   const { name, creditCard, shippingAddress } = req.body;
   if (!cid) throw new ClientError('Cart id required', 400);
   else if (!name) throw new ClientError('Name required', 400);
@@ -135,7 +136,10 @@ app.post('/api/orders', (req, res, next) => {
          VALUES ($1, $2, $3, $4)
       RETURNING *;
   `, [cid, name, creditCard, shippingAddress])
-    .then(result => res.status(201).json(result.rows[0]))
+    .then(result => {
+      delete session.cartId;
+      res.status(201).json(result.rows[0]);
+    })
     .catch(err => next(err));
 });
 
