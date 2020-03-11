@@ -10,7 +10,7 @@ export default class ProductListItem extends React.Component {
             {this.props.product.name}
           </h5>
           <h6 className="card-subtitle text-secondary">
-            {'$' + (this.props.product.price / 100).toFixed(2)}
+            ${(this.props.product.price / 100).toFixed(2)}
           </h6>
           <p className="card-text">
             {this.props.product.shortDescription}
