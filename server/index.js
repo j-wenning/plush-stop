@@ -123,6 +123,26 @@ app.get('/api/cart', (req, res, next) => {
     .catch(err => next(err));
 });
 
+app.post('/api/orders', (req, res, next) => {
+  const cid = req.session.cartId;
+  const session = req.session;
+  const { name, creditCard, shippingAddress } = req.body;
+  if (!cid) throw new ClientError('Cart id required', 400);
+  else if (!name) throw new ClientError('Name required', 400);
+  else if (!creditCard) throw new ClientError('Credit card required', 400);
+  else if (!shippingAddress) throw new ClientError('Shipping address required', 400);
+  db.query(`
+    INSERT INTO "orders" ("cartId", "name", "creditCard", "shippingAddress")
+         VALUES ($1, $2, $3, $4)
+      RETURNING *;
+  `, [cid, name, creditCard, shippingAddress])
+    .then(result => {
+      delete session.cartId;
+      res.status(201).json(result.rows[0]);
+    })
+    .catch(err => next(err));
+});
+
 app.use('/api', (req, res, next) => {
   next(new ClientError(`cannot ${req.method} ${req.originalUrl}`, 404));
 });
