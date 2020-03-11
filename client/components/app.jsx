@@ -2,6 +2,7 @@ import React from 'react';
 import Header from './header';
 import ProductList from './product-list';
 import ProductDetails from './product-details';
+import CartSummary from './cart-summary';
 
 export default class App extends React.Component {
   constructor(props) {
@@ -64,6 +65,11 @@ export default class App extends React.Component {
           productId={this.state.view.params.productId}
           addToCart={productId => this.addToCart(productId)}/>;
         break;
+      case 'cart':
+        view = <CartSummary
+          setView={() => this.setView('catalog', {})}
+          cart={this.state.cart}/>;
+        break;
       default:
         this.setState({ error: 'An unexpected error has occured.' });
         return;
@@ -72,7 +78,9 @@ export default class App extends React.Component {
       ? <h1>Loading ...</h1>
       : (
         <div>
-          <Header cartItemCount={this.state.cart.length}/>
+          <Header
+            setView={() => this.setView('cart', {})}
+            cartItemCount={this.state.cart.length}/>
           {
             this.state.error
               ? <h2>{this.state.error}</h2>

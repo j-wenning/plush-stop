@@ -10,10 +10,12 @@ export default class Header extends React.Component {
           </h2>
         </a>
         <div className="col">
-          <h2 className="col navbar-text text-right">
-            {this.props.cartItemCount} items
-            <i className="fas fa-shopping-cart"/>
-          </h2>
+          <a onClick={this.props.setView}>
+            <h2 className="col navbar-text text-right">
+              {this.props.cartItemCount} items
+              <i className="fas fa-shopping-cart" />
+            </h2>
+          </a>
         </div>
       </div>
     );
