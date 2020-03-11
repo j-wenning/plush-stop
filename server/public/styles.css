@@ -17,3 +17,18 @@ img {
 .product-list-item img {
   height: 225px;
 }
+
+.cart-summary .card-columns{
+  column-count: 1;
+}
+
+.cart-summary-item {
+  height: 250px;
+  width: 100%;
+  padding: 10px 0;
+}
+
+.cart-summary-item img {
+  height:225px;
+  object-position: center;
+}
