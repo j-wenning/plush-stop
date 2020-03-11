@@ -19,9 +19,7 @@ export default class CheckoutForm extends React.Component {
   }
 
   render() {
-    const total = this.props.cart.length > 1
-      ? this.props.cart.reduce((a, b) => (a.price || a) + b.price)
-      : this.props.cart[0].price;
+    const total = this.props.cart.reduce((a, b) => a + b.price, 0);
     const { ...formVals } = this.state;
     return (
       <div className="container-fluid">

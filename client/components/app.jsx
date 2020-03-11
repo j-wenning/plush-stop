@@ -56,7 +56,7 @@ export default class App extends React.Component {
       body: JSON.stringify(order)
     })
       .then(res => res.json())
-      .then(() => this.getCartItems())
+      .then(this.setState({ cart: [] }))
       .catch(err => console.error(err));
   }
 
@@ -106,11 +106,9 @@ export default class App extends React.Component {
             cartItemCount={this.state.cart.length}/>
           {
             this.state.error
-              ? <h2>{this.state.error}</h2>
-              : view
+              ? <h2>{this.state.error}</h2> : view
           }
         </div>
-
       );
   }
 }

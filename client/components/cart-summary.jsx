@@ -6,11 +6,7 @@ export default class CartSummary extends React.Component {
     const items = this.props.cart.map(item =>
       <CartSummaryItem key={item.cartItemId} item={item}/>
     );
-    const total = this.props.cart.length > 1
-      ? this.props.cart.reduce((a, b = 0) => (a.price || a) + b.price)
-      : this.props.cart.length > 0
-        ? this.props.cart[0].price
-        : 0;
+    const total = this.props.cart.reduce((a, b) => a + b.price, 0);
     return (
       <div className="container cart-summary">
         <div className="row">
@@ -25,20 +21,22 @@ export default class CartSummary extends React.Component {
         </div>
         <div className="row">
           <div className="col card-columns">
-            {items.length ? items : <p>Your cart is empty.</p>}
+            {
+              items.length
+                ? items : <p>Your cart is empty.</p>
+            }
           </div>
         </div>
         {
-          this.props.cart.length > 0
-            ? <div className="row">
-              <div className="col">
-                <h2>Item total: ${(total / 100).toFixed(2)}</h2>
-              </div>
-              <div className="col text-right">
-                <button onClick={this.props.viewCheckout} className="btn btn-primary">Checkout</button>
-              </div>
+          this.props.cart.length > 0 &&
+          <div className="row">
+            <div className="col">
+              <h2>Item total: ${(total / 100).toFixed(2)}</h2>
             </div>
-            : ''
+            <div className="col text-right">
+              <button onClick={this.props.viewCheckout} className="btn btn-primary">Checkout</button>
+            </div>
+          </div>
         }
 
       </div>
