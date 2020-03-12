@@ -4,7 +4,10 @@ import CartSummaryItem from './cart-summary-item';
 export default class CartSummary extends React.Component {
   render() {
     const items = this.props.cart.map(item =>
-      <CartSummaryItem key={item.cartItemId} item={item}/>
+      <CartSummaryItem
+        key={item.cartItemId}
+        item={item}
+        setView={() => this.props.viewDetails({ productId: item.productId })}/>
     );
     const total = this.props.cart.reduce((a, b) => a + b.price, 0);
     return (
