@@ -85,6 +85,7 @@ export default class App extends React.Component {
         view = <CartSummary
           viewCatalog={() => this.setView('catalog', {})}
           viewCheckout={() => this.setView('checkout', {})}
+          viewDetails={params => this.setView('details', params)}
           cart={this.state.cart}/>;
         break;
       case 'checkout':
