@@ -148,6 +148,20 @@ app.post('/api/orders', (req, res, next) => {
   }
 });
 
+app.delete('/api/orders/:ciid', (req, res, next) => {
+  const cid = req.session.cartId;
+  const ciid = req.body.cartItemId;
+  if (!ciid) throw new ClientError('Cart item id required', 400);
+  else {
+    db.query(`
+    DELETE FROM "cartItems"
+          WHERE "cartItemId" = $1 AND "cartId" = $2
+    `, [ciid, cid])
+      .then(res.statusCode(204))
+      .catch(err => next(err));
+  }
+});
+
 app.use('/api', (req, res, next) => {
   next(new ClientError(`cannot ${req.method} ${req.originalUrl}`, 404));
 });
