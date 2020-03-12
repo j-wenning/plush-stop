@@ -121,6 +121,28 @@ app.get('/api/cart', (req, res, next) => {
   }
 });
 
+app.delete('/api/cart/', (req, res, next) => {
+  const cid = req.session.cartId;
+  const pid = req.body.productId;
+  const qty = req.body.quantity;
+  if (!pid || !Number(qty)) throw new ClientError('Product id required', 400);
+  else if (!qty || !Number(qty)) throw new ClientError('Quantity required', 400);
+  else if (pid <= 0) throw new ClientError(`Product id ${pid} is invalid`, 400);
+  else if (qty <= 0) throw new ClientError(`Quantity ${pid} is invalid`, 400);
+  db.query(`
+  DELETE FROM "cartItems"
+        WHERE "cartItemId" IN (
+            SELECT "cartItemId"
+              FROM "cartItems"
+             WHERE "productId" = $1 AND "cartId" = $2
+             ORDER BY "cartItemId" DESC
+             LIMIT $3
+          );
+  `, [pid, cid, qty])
+    .then(() => res.sendStatus(204))
+    .catch(err => next(err));
+});
+
 app.post('/api/orders', (req, res, next) => {
   const cid = req.session.cartId;
   const session = req.session;
@@ -139,21 +161,6 @@ app.post('/api/orders', (req, res, next) => {
       delete session.cartId;
       res.status(201).json(result.rows[0]);
     })
-    .catch(err => next(err));
-});
-
-app.delete('/api/orders/:ciid', (req, res, next) => {
-  const cid = req.session.cartId;
-  const ciid = req.body.cartItemId;
-  const qty = req.body.quantity;
-  if (!ciid) throw new ClientError('Cart item id required', 400);
-  else if (!qty) throw new ClientError('Quantity required', 400);
-  db.query(`
-    DELETE FROM "cartItems"
-          WHERE "cartItemId" = $1 AND "cartId" = $2
-          LIMIT $3;
-  `, [ciid, cid, qty])
-    .then(res.statusCode(204))
     .catch(err => next(err));
 });
 
