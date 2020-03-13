@@ -142,7 +142,7 @@ app.patch('/api/cart', (req, res, next) => {
               "p"."shortDescription";
   `, [qty, cid, ciid])
     .then(result => {
-      if (!result.rowCount) throw new ClientError('Cart id mismatch', 400);
+      if (!result.rowCount) throw new ClientError(`Cart item id ${ciid} is invalid`, 400);
       res.status(202).json(result.rows[0]);
     })
     .catch(err => next(err));
