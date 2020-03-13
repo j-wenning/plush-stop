@@ -119,14 +119,33 @@ app.get('/api/cart', (req, res, next) => {
   }
 });
 
-app.patch('api/cart', (req, res, next) => {
-  // const cid = req.session.cartId;
-  const pid = req.body.productId;
+app.patch('/api/cart', (req, res, next) => {
+  const cid = req.session.cartId;
+  const ciid = req.body.cartItemId;
   const qty = req.body.quantity;
-  if (!pid || !Number(qty)) throw new ClientError('Product id required', 400);
+  if (!ciid || !Number(ciid)) throw new ClientError('Cart item id required', 400);
   else if (!qty || !Number(qty)) throw new ClientError('Quantity required', 400);
-  else if (pid <= 0) throw new ClientError(`Product id ${pid} is invalid`, 400);
-  else if (qty <= 0) throw new ClientError(`Quantity ${pid} is invalid`, 400);
+  else if (ciid <= 0) throw new ClientError(`Cart item id ${ciid} is invalid`, 400);
+  else if (qty <= 0) throw new ClientError(`Quantity ${qty} is invalid`, 400);
+  db.query(`
+       UPDATE "cartItems" "ciu"
+          SET "quantity" = $1
+         FROM "cartItems" AS "cio"
+         JOIN "products" as "p" USING("productId")
+        WHERE "cio"."cartId" = $2 AND "cio"."cartItemId" = $3
+    RETURNING "ciu"."cartItemId",
+              "ciu"."quantity",
+              "p"."price",
+              "p"."productId",
+              "p"."image",
+              "p"."name",
+              "p"."shortDescription";
+  `, [qty, cid, ciid])
+    .then(result => {
+      if (!result.rowCount) throw new ClientError('Cart id mismatch', 400);
+      res.status(202).json(result.rows[0]);
+    })
+    .catch(err => next(err));
 });
 
 app.delete('/api/cart/', (req, res, next) => {
@@ -135,7 +154,7 @@ app.delete('/api/cart/', (req, res, next) => {
   else if (ciid <= 0) throw new ClientError(`Cart item id ${ciid} is invalid`, 400);
   db.query(`
        DELETE FROM "cartItems"
-        WHERE "cartItemId" = $1 AND "cartId" = $2
+             WHERE "cartItemId" = $1 AND "cartId" = $2
   `, [ciid, req.session.cartId])
     .then(data => {
       if (data.rowCount === 0) throw new ClientError(`Cart item id ${ciid} is invalid`, 400);
