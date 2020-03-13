@@ -128,12 +128,12 @@ app.patch('/api/cart', (req, res, next) => {
   else if (ciid <= 0) throw new ClientError(`Cart item id ${ciid} is invalid`, 400);
   else if (qty <= 0) throw new ClientError(`Quantity ${qty} is invalid`, 400);
   db.query(`
-       UPDATE "cartItems" "ciu"
+       UPDATE "cartItems" AS "ciu"
           SET "quantity" = $1
          FROM "cartItems" AS "cio"
          JOIN "products" as "p" USING("productId")
-        WHERE "cio"."cartId" = $2 AND "cio"."cartItemId" = $3
-    RETURNING "ciu"."cartItemId",
+        WHERE "ciu"."cartId" = $2 AND "ciu"."cartItemId" = $3
+    RETURNING "cio"."cartItemId",
               "ciu"."quantity",
               "p"."price",
               "p"."productId",

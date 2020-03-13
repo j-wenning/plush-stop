@@ -32,13 +32,13 @@ export default class App extends React.Component {
       .catch(err => console.error(err));
   }
 
-  addToCart(productId, quantity = 1) {
+  addToCart(productId) {
     fetch('/api/cart', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ productId, quantity })
+      body: JSON.stringify({ productId })
     })
       .then(res => res.json())
       .then(data => {
@@ -51,8 +51,25 @@ export default class App extends React.Component {
       .catch(err => console.error(err));
   }
 
+  modifyInCart(cartItemId, quantity) {
+    fetch('/api/cart', {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ cartItemId, quantity })
+    })
+      .then(res => res.json())
+      .then(data => {
+        const [...cart] = this.state.cart;
+        const index = cart.findIndex(a => a.cartItemId === data.cartItemId);
+        cart.splice(index, 1, data);
+        this.setState({ cart });
+      });
+  }
+
   removeFromCart(cartItemId) {
-    fetch('api/cart', {
+    fetch('/api/cart', {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json'
@@ -103,9 +120,9 @@ export default class App extends React.Component {
       case 'cart':
         view = <CartSummary
           viewCatalog={() => this.setView('catalog', {})}
-          viewCheckout={() => this.setView('checkout', {})}
           viewDetails={params => this.setView('details', params)}
-          addToCart={(productId, quantity) => this.addToCart(productId, quantity)}
+          viewCheckout={() => this.setView('checkout', {})}
+          modifyInCart={(cartItemId, quantity) => this.modifyInCart(cartItemId, quantity)}
           removeFromCart={cartItemId => this.removeFromCart(cartItemId)}
           cart={this.state.cart}/>;
         break;

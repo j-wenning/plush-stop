@@ -8,8 +8,8 @@ export default class CartSummary extends React.Component {
         key={item.cartItemId}
         item={item}
         setView={() => this.props.viewDetails({ productId: item.productId })}
-        addToCart={(productId, quantity) => this.props.addToCart(productId, quantity)}
-        removeFromCart={(productId, quantity) => this.props.removeFromCart(productId, quantity)}/>
+        modifyInCart={(cartItemId, quantity) => this.props.modifyInCart(cartItemId, quantity)}
+        removeFromCart={productId => this.props.removeFromCart(productId)}/>
     );
     const total = this.props.cart.reduce((a, b) => a + b.price, 0);
     return (

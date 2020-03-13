@@ -1,22 +1,13 @@
 import React from 'react';
 
 export default class CartSummaryItem extends React.Component {
-  // setQuantity(e) {
-  //   const qty = this.props.item.quantity;
-  //   if (e) {
-  //     e.target.value = Math.max(Number(e.target.value), 1);
-  //     const val = e.target.value;
-  //     if (qty > 1 && qty > val) this.props.removeFromCart(this.props.item.productId, qty - val);
-  //     else this.props.addToCart(this.props.item.productId, val - qty);
-  //   } else this.props.removeFromCart(this.props.item.cart);
-  // }
+  modifyItem(e) {
+    e.target.value = Math.max(Number(e.target.value), 1);
+    this.props.modifyInCart(this.props.item.cartItemId, e.target.value);
+  }
 
   removeItem() {
     this.props.removeFromCart(this.props.item.cartItemId);
-  }
-
-  removeAll() {
-    this.props.removeFromCart(this.props.item.quantity);
   }
 
   render() {
@@ -42,10 +33,10 @@ export default class CartSummaryItem extends React.Component {
               </div>
               <div className="col-6">
                 <div className="from-group row">
-                  <label className="col-form-label col-9 text-right" htmlFor="">Qty</label>
+                  <label className="col-form-label col-8 text-right" htmlFor="">Qty</label>
                   <input
-                    onChange={e => this.setQuantity(e)}
-                    className="form-control col-3"
+                    onChange={e => this.modifyItem(e)}
+                    className="form-control col-4"
                     type="number"
                     name=""
                     id=""
