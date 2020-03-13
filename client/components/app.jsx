@@ -41,13 +41,18 @@ export default class App extends React.Component {
       body: JSON.stringify({ productId, quantity })
     })
       .then(res => res.json())
-      .then(data => this.setState({
-        cart: [...this.state.cart, data]
-      }))
+      .then(data => {
+        const [...cart] = this.state.cart;
+        const index = cart.findIndex(a => a.cartItemId === data.cartItemId);
+        if (index !== -1) cart.splice(index, 1, data);
+        else cart.push(data);
+        this.setState({ cart });
+      })
       .catch(err => console.error(err));
   }
 
   removeFromCart(productId, quantity = 1) {
+
     // console.log('removing item', productId, 'of qty', quantity);
   }
 
@@ -110,7 +115,7 @@ export default class App extends React.Component {
         <div>
           <Header
             setView={() => this.setView('cart', {})}
-            cartItemCount={this.state.cart.length}/>
+            cartItemCount={this.state.cart.reduce((a, b) => a + b.quantity, 0)}/>
           {
             this.state.error
               ? <h2>{this.state.error}</h2> : view

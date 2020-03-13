@@ -2,8 +2,7 @@ import React from 'react';
 
 export default class CartSummaryItem extends React.Component {
   setQuantity(e) {
-    // if(e.currentTarget.value > )
-    // this.props.removeFromCart()
+    if (e) this.props.removeFromCart(this.props.item.productId, this.props.item.quantity);
   }
 
   removeAll() {
@@ -26,10 +25,10 @@ export default class CartSummaryItem extends React.Component {
               <a onClick={this.props.setView}>
                 <h2 className="col-12">{this.props.item.name}</h2>
               </a>
-              <h3 className="col-12 text-secondary">{'$' + (this.props.item.price / 100).toFixed(2)}</h3>
+              <h3 className="col-12 text-secondary">${(this.props.item.price / 100).toFixed(2)}</h3>
               <p className="col-12">{this.props.item.shortDescription}</p>
               <div className="col-6">
-                <button className="btn btn-danger">Remove item</button>
+                <button onClick={e => this.setQuantity(e)} className="btn btn-danger">Remove item</button>
               </div>
               <div className="col-6">
                 <div className="from-group row">

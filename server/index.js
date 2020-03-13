@@ -124,6 +124,7 @@ app.get('/api/cart', (req, res, next) => {
   else {
     db.query(`
       SELECT "c"."cartItemId",
+             "c"."quantity",
              "p"."price",
              "p"."productId",
              "p"."image",
