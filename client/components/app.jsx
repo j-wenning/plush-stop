@@ -51,15 +51,18 @@ export default class App extends React.Component {
       .catch(err => console.error(err));
   }
 
-  removeFromCart(productId, quantity = 1) {
+  removeFromCart(cartItemId) {
     fetch('api/cart', {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ productId, quantity })
+      body: JSON.stringify({ cartItemId })
     })
-      .then(() => this.getCartItems())
+      .then(() => {
+        const [...cart] = this.state.cart.filter(a => a.cartItemId !== cartItemId);
+        this.setState({ cart });
+      })
       .catch(err => console.error(err));
   }
 
@@ -103,7 +106,7 @@ export default class App extends React.Component {
           viewCheckout={() => this.setView('checkout', {})}
           viewDetails={params => this.setView('details', params)}
           addToCart={(productId, quantity) => this.addToCart(productId, quantity)}
-          removeFromCart={(productId, quantity) => this.removeFromCart(productId, quantity)}
+          removeFromCart={cartItemId => this.removeFromCart(cartItemId)}
           cart={this.state.cart}/>;
         break;
       case 'checkout':

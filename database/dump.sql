@@ -16,6 +16,7 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
+ALTER TABLE ONLY public."cartItems" DROP CONSTRAINT uc_productid;
 ALTER TABLE ONLY public.products DROP CONSTRAINT products_pkey;
 ALTER TABLE ONLY public.orders DROP CONSTRAINT orders_pkey;
 ALTER TABLE ONLY public.carts DROP CONSTRAINT carts_pkey;
@@ -74,7 +75,7 @@ CREATE TABLE public."cartItems" (
     "cartItemId" integer NOT NULL,
     "cartId" integer NOT NULL,
     "productId" integer NOT NULL,
-    price integer NOT NULL
+    quantity integer NOT NULL
 );
 
 
@@ -228,13 +229,7 @@ ALTER TABLE ONLY public.products ALTER COLUMN "productId" SET DEFAULT nextval('p
 -- Data for Name: cartItems; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-COPY public."cartItems" ("cartItemId", "cartId", "productId", price) FROM stdin;
-1	1	3	2900
-2	1	1	2999
-3	1	5	9900
-4	2	1	2999
-5	2	4	999
-6	2	1	2999
+COPY public."cartItems" ("cartItemId", "cartId", "productId", quantity) FROM stdin;
 \.
 
 
@@ -243,8 +238,6 @@ COPY public."cartItems" ("cartItemId", "cartId", "productId", price) FROM stdin;
 --
 
 COPY public.carts ("cartId", "createdAt") FROM stdin;
-1	2020-03-10 13:02:13.697565-07
-2	2020-03-10 15:24:22.838261-07
 \.
 
 
@@ -274,14 +267,14 @@ COPY public.products ("productId", name, price, image, "shortDescription", "long
 -- Name: cartItems_cartItemId_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public."cartItems_cartItemId_seq"', 6, true);
+SELECT pg_catalog.setval('public."cartItems_cartItemId_seq"', 1, false);
 
 
 --
 -- Name: carts_cartId_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public."carts_cartId_seq"', 2, true);
+SELECT pg_catalog.setval('public."carts_cartId_seq"', 1, false);
 
 
 --
@@ -328,6 +321,14 @@ ALTER TABLE ONLY public.orders
 
 ALTER TABLE ONLY public.products
     ADD CONSTRAINT products_pkey PRIMARY KEY ("productId");
+
+
+--
+-- Name: cartItems uc_productid; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public."cartItems"
+    ADD CONSTRAINT uc_productid UNIQUE ("cartId", "productId");
 
 
 --

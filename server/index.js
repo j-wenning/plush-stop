@@ -48,19 +48,15 @@ app.get('/api/products/:id', (req, res, next) => {
 
 app.post('/api/cart', (req, res, next) => {
   const pid = req.body.productId;
-  const qty = req.body.quantity;
   if (!pid) throw new ClientError('Product id required', 400);
-  else if (!qty) throw new ClientError('Quantity required', 400);
   else if (!Number(pid) || pid <= 0) throw new ClientError(`Product id ${pid} is invalid`, 400);
-  else if (!Number(qty) || qty <= 0) throw new ClientError(`Quantity ${pid} is invalid`, 400);
   db.query(`
-    SELECT *
+    SELECT 1
       FROM "products"
      WHERE "productId" = $1;
   `, [pid])
     .then(result => {
-      const row = result.rows[0];
-      if (!row) throw new ClientError(`Product does not exist at id: ${pid}`, 404);
+      if (!result.rowCount) throw new ClientError(`Product does not exist at id: ${pid}`, 404);
       if (req.session.cartId) return { cartId: req.session.cartId };
       return db.query(`
         INSERT INTO "carts" ("cartId", "createdAt")
@@ -69,48 +65,30 @@ app.post('/api/cart', (req, res, next) => {
       `);
     })
     .then(result => {
-      const row = result.rows ? result.rows[0] : result;
-      req.session.cartId = row.cartId;
+      const cid = (result.rowCount ? result.rows[0] : result).cartId;
+      req.session.cartId = cid;
       return db.query(`
-        SELECT "cartItemId",
-               "cartId",
-               "productId"
-          FROM "cartItems"
-         WHERE "cartId" = $1
-      `, [row.cartId]);
+      INSERT INTO "cartItems" ("cartId", "productId", "quantity")
+           VALUES ($1, $2, 1)
+      ON CONFLICT ON CONSTRAINT uc_productId DO UPDATE
+              SET "quantity" = "cartItems"."quantity" + 1
+        RETURNING "cartItemId";
+      `, [cid, pid]);
     })
     .then(result => {
-      const row = result.rows;
-      const filtered = row.filter(a => Number(pid) === a.productId);
-      if (filtered.length && filtered[0].cartItemId) {
-        return db.query(`
-             UPDATE "cartItems"
-                SET "quantity" = "quantity" + $2
-              WHERE "cartItemId" = $1
-          RETURNING "cartItemId";
-        `, [filtered[0].cartItemId, qty]);
-      } else {
-        return db.query(`
-        INSERT INTO "cartItems" ("cartId", "productId", "quantity")
-             VALUES ($1, $2, $3)
-          RETURNING "cartItemId";
-      `, [req.session.cartId, pid, qty]);
-      }
-    })
-    .then(result => {
-      const row = result.rows ? result.rows[0] : result;
+      const row = result.rows[0];
       return db.query(`
-        SELECT "c"."cartItemId",
-               "c"."quantity",
-               "p"."price",
-               "p"."productId",
-               "p"."image",
-               "p"."name",
-               "p"."shortDescription"
-          FROM "cartItems" AS "c"
-          JOIN "products" AS "p" USING ("productId")
-         WHERE "cartItemId" = $1;
-      `, [row.cartItemId]);
+          SELECT "c"."cartItemId",
+                 "c"."quantity",
+                 "p"."price",
+                 "p"."productId",
+                 "p"."image",
+                 "p"."name",
+                 "p"."shortDescription"
+            FROM "cartItems" AS "c"
+            JOIN "products" AS "p" USING ("productId")
+           WHERE "cartItemId" = $1;
+        `, [row.cartItemId]);
     })
     .then(result => {
       res.status(201).json(result.rows[0]);
@@ -141,30 +119,28 @@ app.get('/api/cart', (req, res, next) => {
   }
 });
 
-app.delete('/api/cart/', (req, res, next) => {
-  const cid = req.session.cartId;
+app.patch('api/cart', (req, res, next) => {
+  // const cid = req.session.cartId;
   const pid = req.body.productId;
   const qty = req.body.quantity;
   if (!pid || !Number(qty)) throw new ClientError('Product id required', 400);
   else if (!qty || !Number(qty)) throw new ClientError('Quantity required', 400);
   else if (pid <= 0) throw new ClientError(`Product id ${pid} is invalid`, 400);
   else if (qty <= 0) throw new ClientError(`Quantity ${pid} is invalid`, 400);
+});
+
+app.delete('/api/cart/', (req, res, next) => {
+  const ciid = req.body.cartItemId;
+  if (!ciid || !Number(ciid)) throw new ClientError('Cart item id required', 400);
+  else if (ciid <= 0) throw new ClientError(`Cart item id ${ciid} is invalid`, 400);
   db.query(`
-       UPDATE "cartItems"
-          SET "quantity" = "quantity" - $1
-        WHERE "cartId" = $2 AND "productId" = $3
-    RETURNING "quantity";
-  `, [qty, cid, pid])
-    .then(result => {
-      const row = result.rows[0];
-      if (row.quantity <= 0) {
-        return db.query(`
-          DELETE FROM "cartItems"
-                WHERE "cartId" = $1 AND "productId" = $2
-        `, [cid, pid]);
-      }
+       DELETE FROM "cartItems"
+        WHERE "cartItemId" = $1 AND "cartId" = $2
+  `, [ciid, req.session.cartId])
+    .then(data => {
+      if (data.rowCount === 0) throw new ClientError(`Cart item id ${ciid} is invalid`, 400);
+      res.sendStatus(204);
     })
-    .then(() => res.sendStatus(204))
     .catch(err => next(err));
 });
 

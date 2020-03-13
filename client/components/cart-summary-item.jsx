@@ -1,13 +1,18 @@
 import React from 'react';
 
 export default class CartSummaryItem extends React.Component {
-  setQuantity(e) {
-    const qty = this.props.item.quantity;
-    if (e) {
-      const val = Number(e.target.value);
-      if (qty > val) this.props.removeFromCart(this.props.item.productId, qty - val);
-      else this.props.addToCart(this.props.item.productId, val - qty);
-    } else this.props.removeFromCart(this.props.item.productId, qty);
+  // setQuantity(e) {
+  //   const qty = this.props.item.quantity;
+  //   if (e) {
+  //     e.target.value = Math.max(Number(e.target.value), 1);
+  //     const val = e.target.value;
+  //     if (qty > 1 && qty > val) this.props.removeFromCart(this.props.item.productId, qty - val);
+  //     else this.props.addToCart(this.props.item.productId, val - qty);
+  //   } else this.props.removeFromCart(this.props.item.cart);
+  // }
+
+  removeItem() {
+    this.props.removeFromCart(this.props.item.cartItemId);
   }
 
   removeAll() {
@@ -33,7 +38,7 @@ export default class CartSummaryItem extends React.Component {
               <h3 className="col-12 text-secondary">${(this.props.item.price / 100).toFixed(2)}</h3>
               <p className="col-12">{this.props.item.shortDescription}</p>
               <div className="col-6">
-                <button onClick={() => this.setQuantity()} className="btn btn-danger">Remove item</button>
+                <button onClick={() => this.removeItem()} className="btn btn-danger">Remove item</button>
               </div>
               <div className="col-6">
                 <div className="from-group row">
