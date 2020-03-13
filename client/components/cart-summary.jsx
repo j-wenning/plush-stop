@@ -2,12 +2,28 @@ import React from 'react';
 import CartSummaryItem from './cart-summary-item';
 
 export default class CartSummary extends React.Component {
+  condenseProducts() {
+    const result = [];
+    const cart = this.props.cart;
+    let index;
+    for (let i = 0; i < cart.length; ++i) {
+      index = result.findIndex(a => a.productId === cart[i].productId);
+      if (index === -1) {
+        result.push({ ...cart[i] });
+        result[result.length - 1].quantity = 1;
+      } else ++result[index].quantity;
+    }
+    return result;
+  }
+
   render() {
-    const items = this.props.cart.map(item =>
+    const items = this.condenseProducts().map(item =>
       <CartSummaryItem
         key={item.cartItemId}
         item={item}
-        setView={() => this.props.viewDetails({ productId: item.productId })}/>
+        setView={() => this.props.viewDetails({ productId: item.productId })}
+        addToCart={(productId, quantity) => this.props.addToCart(productId, quantity)}
+        removeFromCart={(productId, quantity) => this.props.removeFromCart(productId, quantity)}/>
     );
     const total = this.props.cart.reduce((a, b) => a + b.price, 0);
     return (

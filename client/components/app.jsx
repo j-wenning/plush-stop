@@ -32,19 +32,23 @@ export default class App extends React.Component {
       .catch(err => console.error(err));
   }
 
-  addToCart(product) {
+  addToCart(productId, quantity = 1) {
     fetch('/api/cart', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ productId: Number(product.productId) })
+      body: JSON.stringify({ productId, quantity })
     })
       .then(res => res.json())
       .then(data => this.setState({
         cart: [...this.state.cart, data]
       }))
       .catch(err => console.error(err));
+  }
+
+  removeFromCart(productId, quantity = 1) {
+    // console.log('removing item', productId, 'of qty', quantity);
   }
 
   placeOrder(order) {
@@ -86,6 +90,8 @@ export default class App extends React.Component {
           viewCatalog={() => this.setView('catalog', {})}
           viewCheckout={() => this.setView('checkout', {})}
           viewDetails={params => this.setView('details', params)}
+          addToCart={(productId, quantity) => this.addToCart(productId, quantity)}
+          removeFromCart={(productId, quantity) => this.removeFromCart(productId, quantity)}
           cart={this.state.cart}/>;
         break;
       case 'checkout':

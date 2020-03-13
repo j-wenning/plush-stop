@@ -1,6 +1,15 @@
 import React from 'react';
 
 export default class CartSummaryItem extends React.Component {
+  setQuantity(e) {
+    // if(e.currentTarget.value > )
+    // this.props.removeFromCart()
+  }
+
+  removeAll() {
+    this.props.removeFromCart(this.props.item.quantity);
+  }
+
   render() {
     return (
       <div className="card cart-summary-item">
@@ -19,6 +28,21 @@ export default class CartSummaryItem extends React.Component {
               </a>
               <h3 className="col-12 text-secondary">{'$' + (this.props.item.price / 100).toFixed(2)}</h3>
               <p className="col-12">{this.props.item.shortDescription}</p>
+              <div className="col-6">
+                <button className="btn btn-danger">Remove item</button>
+              </div>
+              <div className="col-6">
+                <div className="from-group row">
+                  <label className="col-form-label col-9 text-right" htmlFor="">Qty</label>
+                  <input
+                    onChange={e => this.setQuantity(e)}
+                    className="form-control col-3"
+                    type="number"
+                    name=""
+                    id=""
+                    defaultValue={this.props.item.quantity}/>
+                </div>
+              </div>
             </div>
           </div>
         </div>
