@@ -52,8 +52,15 @@ export default class App extends React.Component {
   }
 
   removeFromCart(productId, quantity = 1) {
-
-    // console.log('removing item', productId, 'of qty', quantity);
+    fetch('api/cart', {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ productId, quantity })
+    })
+      .then(() => this.getCartItems())
+      .catch(err => console.error(err));
   }
 
   placeOrder(order) {
