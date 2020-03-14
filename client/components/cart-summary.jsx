@@ -7,9 +7,11 @@ export default class CartSummary extends React.Component {
       <CartSummaryItem
         key={item.cartItemId}
         item={item}
-        setView={() => this.props.viewDetails({ productId: item.productId })}/>
+        setView={() => this.props.viewDetails({ productId: item.productId })}
+        modifyInCart={(cartItemId, quantity) => this.props.modifyInCart(cartItemId, quantity)}
+        removeFromCart={productId => this.props.removeFromCart(productId)}/>
     );
-    const total = this.props.cart.reduce((a, b) => a + b.price, 0);
+    const total = this.props.cart.reduce((a, b) => a + b.price * b.quantity, 0);
     return (
       <div className="container cart-summary">
         <div className="row">

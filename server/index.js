@@ -33,7 +33,7 @@ app.get('/api/products', (req, res, next) => {
 
 app.get('/api/products/:id', (req, res, next) => {
   const id = req.params.id;
-  if (id <= 0) throw new ClientError(`Product id ${id} is invalid`, 400);
+  if (!Number(id) || id <= 0) throw new ClientError(`Product id ${id} is invalid`, 400);
   db.query(`
     SELECT *
       FROM "products"
@@ -51,47 +51,40 @@ app.post('/api/cart', (req, res, next) => {
   if (!pid) throw new ClientError('Product id required', 400);
   else if (!Number(pid) || pid <= 0) throw new ClientError(`Product id ${pid} is invalid`, 400);
   db.query(`
-    SELECT "price"
+    SELECT 1
       FROM "products"
      WHERE "productId" = $1;
   `, [pid])
     .then(result => {
-      const row = result.rows[0];
-      if (!row) throw new ClientError(`Product does not exist at id: ${pid}`, 404);
-      if (req.session.cartId) {
-        return {
-          cartId: req.session.cartId,
-          price: row.price
-        };
-      }
+      if (!result.rowCount) throw new ClientError(`Product does not exist at id: ${pid}`, 404);
+      if (req.session.cartId) return { cartId: req.session.cartId };
       return db.query(`
         INSERT INTO "carts" ("cartId", "createdAt")
              VALUES (DEFAULT, DEFAULT)
-          RETURNING "cartId", $1 AS "price";
-      `, [row.price]);
+          RETURNING "cartId";
+      `);
     })
     .then(result => {
-      const row = result.rows ? result.rows[0] : result;
-      req.session.cartId = row.cartId;
+      const cid = (result.rowCount ? result.rows[0] : result).cartId;
+      req.session.cartId = cid;
       return db.query(`
-        INSERT INTO "cartItems" ("cartId", "productId", "price")
-             VALUES ($1, $2, $3)
-          RETURNING "cartItemId";
-      `, [row.cartId, pid, row.price]);
-    })
-    .then(result => {
-      const row = result.rows[0];
-      return db.query(`
-        SELECT "c"."cartItemId",
-               "c"."price",
-               "p"."productId",
-               "p"."image",
-               "p"."name",
-               "p"."shortDescription"
-          FROM "cartItems" AS "c"
-          JOIN "products" AS "p" USING ("productId")
-         WHERE "cartItemId" = $1;
-      `, [row.cartItemId]);
+      WITH "inserted_row" AS (
+        INSERT INTO "cartItems" ("cartId", "productId", "quantity")
+             VALUES ($1, $2, 1)
+        ON CONFLICT ON CONSTRAINT uc_productId DO UPDATE
+                SET "quantity" = "cartItems"."quantity" + 1
+          RETURNING *
+      )
+      SELECT "c"."cartItemId",
+             "c"."quantity",
+             "p"."price",
+             "p"."productId",
+             "p"."image",
+             "p"."name",
+             "p"."shortDescription"
+        FROM "inserted_row" AS "c"
+        JOIN "products" AS "p" USING ("productId");
+      `, [cid, pid]);
     })
     .then(result => {
       res.status(201).json(result.rows[0]);
@@ -105,7 +98,8 @@ app.get('/api/cart', (req, res, next) => {
   else {
     db.query(`
       SELECT "c"."cartItemId",
-             "c"."price",
+             "c"."quantity",
+             "p"."price",
              "p"."productId",
              "p"."image",
              "p"."name",
@@ -121,25 +115,50 @@ app.get('/api/cart', (req, res, next) => {
   }
 });
 
-app.delete('/api/cart/', (req, res, next) => {
+app.patch('/api/cart', (req, res, next) => {
   const cid = req.session.cartId;
-  const pid = req.body.productId;
+  const ciid = req.body.cartItemId;
   const qty = req.body.quantity;
-  if (!pid || !Number(qty)) throw new ClientError('Product id required', 400);
+  if (!ciid || !Number(ciid)) throw new ClientError('Cart item id required', 400);
   else if (!qty || !Number(qty)) throw new ClientError('Quantity required', 400);
-  else if (pid <= 0) throw new ClientError(`Product id ${pid} is invalid`, 400);
-  else if (qty <= 0) throw new ClientError(`Quantity ${pid} is invalid`, 400);
+  else if (ciid <= 0) throw new ClientError(`Cart item id ${ciid} is invalid`, 400);
+  else if (qty <= 0) throw new ClientError(`Quantity ${qty} is invalid`, 400);
   db.query(`
-  DELETE FROM "cartItems"
-        WHERE "cartItemId" IN (
-            SELECT "cartItemId"
-              FROM "cartItems"
-             WHERE "productId" = $1 AND "cartId" = $2
-             ORDER BY "cartItemId" DESC
-             LIMIT $3
-          );
-  `, [pid, cid, qty])
-    .then(() => res.sendStatus(204))
+  WITH "updated_row" AS (
+       UPDATE "cartItems" AS "ciu"
+          SET "quantity" = $1
+        WHERE "ciu"."cartId" = $2 AND "ciu"."cartItemId" = $3
+    RETURNING *
+  )
+  SELECT "c"."cartItemId",
+         "c"."quantity",
+         "p"."price",
+         "p"."productId",
+         "p"."image",
+         "p"."name",
+         "p"."shortDescription"
+    FROM "updated_row" AS "c"
+    JOIN "products" AS "p" USING("productId");
+  `, [qty, cid, ciid])
+    .then(result => {
+      if (!result.rowCount) throw new ClientError(`Cart item id ${ciid} is invalid`, 400);
+      res.status(202).json(result.rows[0]);
+    })
+    .catch(err => next(err));
+});
+
+app.delete('/api/cart/', (req, res, next) => {
+  const ciid = req.body.cartItemId;
+  if (!ciid || !Number(ciid)) throw new ClientError('Cart item id required', 400);
+  else if (ciid <= 0) throw new ClientError(`Cart item id ${ciid} is invalid`, 400);
+  db.query(`
+       DELETE FROM "cartItems"
+             WHERE "cartItemId" = $1 AND "cartId" = $2
+  `, [ciid, req.session.cartId])
+    .then(data => {
+      if (data.rowCount === 0) throw new ClientError(`Cart item id ${ciid} is invalid`, 400);
+      res.sendStatus(204);
+    })
     .catch(err => next(err));
 });
 
@@ -147,8 +166,7 @@ app.post('/api/orders', (req, res, next) => {
   const cid = req.session.cartId;
   const session = req.session;
   const { name, creditCard, shippingAddress } = req.body;
-  if (!cid) throw new ClientError('Cart id required', 400);
-  else if (!name) throw new ClientError('Name required', 400);
+  if (!name) throw new ClientError('Name required', 400);
   else if (!creditCard) throw new ClientError('Credit card required', 400);
   else if (!shippingAddress) throw new ClientError('Shipping address required', 400);
   db.query(`
