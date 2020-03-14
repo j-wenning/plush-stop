@@ -68,27 +68,23 @@ app.post('/api/cart', (req, res, next) => {
       const cid = (result.rowCount ? result.rows[0] : result).cartId;
       req.session.cartId = cid;
       return db.query(`
-      INSERT INTO "cartItems" ("cartId", "productId", "quantity")
-           VALUES ($1, $2, 1)
-      ON CONFLICT ON CONSTRAINT uc_productId DO UPDATE
-              SET "quantity" = "cartItems"."quantity" + 1
-        RETURNING "cartItemId";
+      WITH "inserted_row" AS (
+        INSERT INTO "cartItems" ("cartId", "productId", "quantity")
+             VALUES ($1, $2, 1)
+        ON CONFLICT ON CONSTRAINT uc_productId DO UPDATE
+                SET "quantity" = "cartItems"."quantity" + 1
+          RETURNING *
+      )
+      SELECT "c"."cartItemId",
+             "c"."quantity",
+             "p"."price",
+             "p"."productId",
+             "p"."image",
+             "p"."name",
+             "p"."shortDescription"
+        FROM "inserted_row" AS "c"
+        JOIN "products" AS "p" USING ("productId");
       `, [cid, pid]);
-    })
-    .then(result => {
-      const row = result.rows[0];
-      return db.query(`
-          SELECT "c"."cartItemId",
-                 "c"."quantity",
-                 "p"."price",
-                 "p"."productId",
-                 "p"."image",
-                 "p"."name",
-                 "p"."shortDescription"
-            FROM "cartItems" AS "c"
-            JOIN "products" AS "p" USING ("productId")
-           WHERE "cartItemId" = $1;
-        `, [row.cartItemId]);
     })
     .then(result => {
       res.status(201).json(result.rows[0]);
@@ -128,18 +124,21 @@ app.patch('/api/cart', (req, res, next) => {
   else if (ciid <= 0) throw new ClientError(`Cart item id ${ciid} is invalid`, 400);
   else if (qty <= 0) throw new ClientError(`Quantity ${qty} is invalid`, 400);
   db.query(`
+  WITH "updated_row" AS (
        UPDATE "cartItems" AS "ciu"
           SET "quantity" = $1
-         FROM "cartItems" AS "cio"
-         JOIN "products" as "p" USING("productId")
         WHERE "ciu"."cartId" = $2 AND "ciu"."cartItemId" = $3
-    RETURNING "cio"."cartItemId",
-              "ciu"."quantity",
-              "p"."price",
-              "p"."productId",
-              "p"."image",
-              "p"."name",
-              "p"."shortDescription";
+    RETURNING *
+  )
+  SELECT "c"."cartItemId",
+         "c"."quantity",
+         "p"."price",
+         "p"."productId",
+         "p"."image",
+         "p"."name",
+         "p"."shortDescription"
+    FROM "updated_row" AS "c"
+    JOIN "products" AS "p" USING("productId");
   `, [qty, cid, ciid])
     .then(result => {
       if (!result.rowCount) throw new ClientError(`Cart item id ${ciid} is invalid`, 400);
