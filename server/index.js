@@ -19,7 +19,7 @@ app.get('/api/health-check', (req, res, next) => {
     .catch(err => next(err));
 });
 
-app.get('/api/cart/visit-check', (req, res, next) => {
+app.get('/api/visit-check', (req, res, next) => {
   const sess = req.session;
   if (!sess.visitCount) sess.visitCount = 1;
   else ++sess.visitCount;
