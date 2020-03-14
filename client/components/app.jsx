@@ -4,6 +4,7 @@ import ProductList from './product-list';
 import ProductDetails from './product-details';
 import CartSummary from './cart-summary';
 import CheckoutForm from './checkout-form';
+import Notice from './notice';
 
 export default class App extends React.Component {
   constructor(props) {
@@ -140,6 +141,7 @@ export default class App extends React.Component {
       ? <h1>Loading ...</h1>
       : (
         <div>
+          <Notice/>
           <Header
             setView={() => this.setView('cart', {})}
             cartItemCount={this.state.cart.reduce((a, b) => a + b.quantity, 0)}/>

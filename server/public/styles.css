@@ -34,6 +34,15 @@ img {
   object-position: center;
 }
 
+.alert {
+  transition: transform .2s step-end .2s,
+  opacity .15s linear;
+}
+
+.alert:not(.show) {
+  transform: translateY(-100%);
+}
+
 @media only screen and (max-width: 992px) {
   .product-list.card-columns{
     column-count: 2;
