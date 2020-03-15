@@ -3,7 +3,7 @@ import React from 'react';
 export default class CheckoutForm extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { name: '', creditCard: '', shippingAddress: '' };
+    this.state = { name: null, creditCard: null, shippingAddress: null };
   }
 
   onValChange(e, val) {
@@ -21,11 +21,13 @@ export default class CheckoutForm extends React.Component {
   render() {
     const total = this.props.cart.reduce((a, b) => a + b.price * b.quantity, 0);
     const { ...formVals } = this.state;
+    const enabled = this.state.name && this.state.creditCard && this.state.shippingAddress;
     return (
-      <div className="container-fluid">
+      <div className="container">
         <h1 className="mb-3">My Cart</h1>
         <h3 className="text-secondary mb-5">Order Total: ${(total / 100).toFixed(2)}</h3>
         <form onSubmit={e => this.placeOrder(e, formVals)}>
+          <h3 className="form-text text-danger">Please do not supply any real information on this form.</h3>
           <div className="form-group">
             <label htmlFor="name">Name</label>
             <input
@@ -45,6 +47,7 @@ export default class CheckoutForm extends React.Component {
               name="credit"
               id="credit"
               required/>
+
           </div>
           <div className="form-group">
             <label htmlFor="shipping">Shipping Address</label>
@@ -62,7 +65,7 @@ export default class CheckoutForm extends React.Component {
               <a onClick={this.props.setView} className="text-secondary">{'< Continue Shopping'}</a>
             </div>
             <div className="col text-right">
-              <button className="btn btn-primary" type="submit">Place Order</button>
+              <button className="btn btn-primary" type="submit" disabled={!enabled}>Place Order</button>
             </div>
           </div>
         </form>

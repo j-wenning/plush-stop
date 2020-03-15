@@ -4,6 +4,7 @@ import ProductList from './product-list';
 import ProductDetails from './product-details';
 import CartSummary from './cart-summary';
 import CheckoutForm from './checkout-form';
+import Notice from './notice';
 
 export default class App extends React.Component {
   constructor(props) {
@@ -15,7 +16,8 @@ export default class App extends React.Component {
         name: 'catalog',
         params: {}
       },
-      cart: []
+      cart: [],
+      visitCount: null
     };
   }
 
@@ -96,10 +98,18 @@ export default class App extends React.Component {
       .catch(err => console.error(err));
   }
 
+  getVisits() {
+    fetch('/api/visit-check')
+      .then(res => res.json())
+      .then(data => this.setState({ visitCount: data.visitCount }))
+      .catch(err => console.error(err));
+  }
+
   componentDidMount() {
     fetch('/api/health-check')
       .catch(err => this.setState({ message: err.message }))
       .then(() => this.getCartItems())
+      .then(() => this.getVisits())
       .finally(() => this.setState({ isLoading: false }));
   }
 
@@ -140,6 +150,9 @@ export default class App extends React.Component {
       ? <h1>Loading ...</h1>
       : (
         <div>
+          {
+            this.state.visitCount < 5 && <Notice />
+          }
           <Header
             setView={() => this.setView('cart', {})}
             cartItemCount={this.state.cart.reduce((a, b) => a + b.quantity, 0)}/>

@@ -19,6 +19,13 @@ app.get('/api/health-check', (req, res, next) => {
     .catch(err => next(err));
 });
 
+app.get('/api/visit-check', (req, res, next) => {
+  const sess = req.session;
+  if (!sess.visitCount) sess.visitCount = 1;
+  else ++sess.visitCount;
+  res.json({ visitCount: sess.visitCount });
+});
+
 app.get('/api/products', (req, res, next) => {
   db.query(`
     SELECT "productId",
@@ -68,22 +75,22 @@ app.post('/api/cart', (req, res, next) => {
       const cid = (result.rowCount ? result.rows[0] : result).cartId;
       req.session.cartId = cid;
       return db.query(`
-      WITH "inserted_row" AS (
-        INSERT INTO "cartItems" ("cartId", "productId", "quantity")
-             VALUES ($1, $2, 1)
-        ON CONFLICT ON CONSTRAINT uc_productId DO UPDATE
-                SET "quantity" = "cartItems"."quantity" + 1
-          RETURNING *
-      )
-      SELECT "c"."cartItemId",
-             "c"."quantity",
-             "p"."price",
-             "p"."productId",
-             "p"."image",
-             "p"."name",
-             "p"."shortDescription"
-        FROM "inserted_row" AS "c"
-        JOIN "products" AS "p" USING ("productId");
+        WITH "inserted_row" AS (
+          INSERT INTO "cartItems" ("cartId", "productId", "quantity")
+               VALUES ($1, $2, 1)
+          ON CONFLICT ON CONSTRAINT uc_productId DO UPDATE
+                  SET "quantity" = "cartItems"."quantity" + 1
+            RETURNING *
+        )
+        SELECT "c"."cartItemId",
+               "c"."quantity",
+               "p"."price",
+               "p"."productId",
+               "p"."image",
+               "p"."name",
+               "p"."shortDescription"
+          FROM "inserted_row" AS "c"
+          JOIN "products" AS "p" USING ("productId");
       `, [cid, pid]);
     })
     .then(result => {
