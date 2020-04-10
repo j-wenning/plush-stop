@@ -34,3 +34,32 @@ Try the application live at https://wicked-sales.jwenning.digital.
 ![mobile details](./images/mobile-preview-details.png)
 ![mobile cart](./images/mobile-preview-cart.png)
 ![mobile checkout](./images/mobile-preview-checkout.png)
+
+
+## Development
+
+#### System Requirements
+- Node.js 10.15.3+
+- npm 6.14.2
+- PostgreSQL 10.10+
+
+#### Getting Started
+
+1. Clone the repository.
+
+        git clone https://github.com/j-wenning/wicked-sales.git
+        cd wicked-sales
+
+2. Install dependencies with NPM
+
+        npm install
+
+3. Import example database to Postgres with NPM.
+
+        npm run db:import
+
+4. Start the project.
+
+        npm run dev
+
+    You can view the application by opening http://localhost:3000 in your browser!
