@@ -4,12 +4,15 @@ A full stack Content Management System (CMS) web application for consumers who w
 
 ## Technologies Used
 
-- React.js
+- Node.js 10
+- npm 6
+- Express.js 4
+- React.js 16
 - Webpack 4
 - Bootstrap 4
-- PostgreSQL 10.10
-- HTML5
-- CSS3
+- PostgreSQL 10
+- HTML 5
+- CSS 3
 
 ## Live Demo
 
