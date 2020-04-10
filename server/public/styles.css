@@ -53,4 +53,14 @@ img {
   .product-list.card-columns{
     column-count: 1;
   }
+
+  .cart-summary-item {
+    height: 450px;
+  }
+}
+
+@media only screen and (max-width: 576px) {
+  .cart-summary-item {
+    height: 500px;
+  }
 }
