@@ -43,6 +43,10 @@ img {
   transform: translateY(-100%);
 }
 
+.modal {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
 @media only screen and (max-width: 992px) {
   .product-list.card-columns{
     column-count: 2;
