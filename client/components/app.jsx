@@ -4,6 +4,7 @@ import ProductList from './product-list';
 import ProductDetails from './product-details';
 import CartSummary from './cart-summary';
 import CheckoutForm from './checkout-form';
+import CheckoutConfirmation from './checkout-confirmation';
 import Notice from './notice';
 
 export default class App extends React.Component {
@@ -94,6 +95,7 @@ export default class App extends React.Component {
       body: JSON.stringify(order)
     })
       .then(res => res.json())
+      .then(data => this.setView('confirmation', { cart: data }))
       .then(this.setState({ cart: [] }))
       .catch(err => console.error(err));
   }
@@ -138,9 +140,14 @@ export default class App extends React.Component {
         break;
       case 'checkout':
         view = <CheckoutForm
-          setView={() => this.setView('catalog', {})}
+          viewCatalog={() => this.setView('catalog', {})}
           placeOrder={order => this.placeOrder(order)}
           cart={this.state.cart}/>;
+        break;
+      case 'confirmation':
+        view = <CheckoutConfirmation
+          viewCatalog={() => this.setView('catalog', {})}
+          cart={this.state.view.params.cart}/>;
         break;
       default:
         this.setState({ error: 'An unexpected error has occured.' });
