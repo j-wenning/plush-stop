@@ -177,14 +177,22 @@ app.post('/api/orders', (req, res, next) => {
   else if (!creditCard) throw new ClientError('Credit card required', 400);
   else if (!shippingAddress) throw new ClientError('Shipping address required', 400);
   db.query(`
-    INSERT INTO "orders" ("cartId", "name", "creditCard", "shippingAddress")
-         VALUES ($1, $2, $3, $4)
-      RETURNING *;
+    WITH "orders_cte" AS (
+      INSERT INTO "orders" ("cartId", "name", "creditCard", "shippingAddress")
+           VALUES ($1, $2, $3, $4)
+    )
+    SELECT "c"."productId",
+           "c"."quantity",
+           "p"."name",
+           "c"."quantity" * "p"."price" AS "total"
+      FROM "cartItems" AS "c"
+      JOIN "products" AS "p" USING ("productId")
+     WHERE "c"."cartId" = $1;
   `, [cid, name, creditCard, shippingAddress])
     .then(result => {
       session.cartId = null;
       delete session.cartId;
-      res.status(201).json(result.rows[0]);
+      res.status(201).json(result.rows);
     })
     .catch(err => next(err));
 });
