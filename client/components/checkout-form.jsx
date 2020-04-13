@@ -102,7 +102,6 @@ export default class CheckoutForm extends React.Component {
     e.preventDefault();
     if (this.props.cart.length > 0) {
       this.props.placeOrder(order);
-      this.props.setView();
     } else alert('Your cart is empty!');
   }
 
@@ -219,7 +218,7 @@ export default class CheckoutForm extends React.Component {
           </div>
           <div className="row">
             <div className="col">
-              <a onClick={this.props.setView} className="text-secondary">{'< Continue Shopping'}</a>
+              <a onClick={this.props.viewCatalog} className="text-secondary">{'< Continue Shopping'}</a>
             </div>
             <div className="col text-right">
               <button className="btn btn-primary" type="submit" disabled={!enabled}>Place Order</button>
