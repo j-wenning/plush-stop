@@ -15,6 +15,11 @@ img {
   height: 400px;
 }
 
+.product-list-item:hover {
+  transform: scale(1.025);
+  box-shadow: inset 0 0 5px 1px lightblue;
+}
+
 .product-list-item img {
   height: 225px;
 }
