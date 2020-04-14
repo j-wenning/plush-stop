@@ -79,7 +79,7 @@ app.post('/api/cart', (req, res, next) => {
           INSERT INTO "cartItems" ("cartId", "productId", "quantity")
                VALUES ($1, $2, 1)
           ON CONFLICT ON CONSTRAINT uc_productId DO UPDATE
-                  SET "quantity" = "cartItems"."quantity" + 1
+                  SET "quantity" = LEAST("cartItems"."quantity" + 1, 99)
             RETURNING *
         )
         SELECT "c"."cartItemId",
@@ -129,7 +129,7 @@ app.patch('/api/cart', (req, res, next) => {
   if (!ciid || !Number(ciid)) throw new ClientError('Cart item id required', 400);
   else if (!qty || !Number(qty)) throw new ClientError('Quantity required', 400);
   else if (ciid <= 0) throw new ClientError(`Cart item id ${ciid} is invalid`, 400);
-  else if (qty <= 0) throw new ClientError(`Quantity ${qty} is invalid`, 400);
+  else if (qty <= 0 || qty > 99) throw new ClientError(`Quantity ${qty} is invalid`, 400);
   db.query(`
   WITH "updated_row" AS (
        UPDATE "cartItems" AS "ciu"
