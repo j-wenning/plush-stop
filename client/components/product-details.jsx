@@ -27,7 +27,7 @@ export default class ProductDetails extends React.Component {
         <div className="card p-4">
           <div className="row">
             <div className="col mb-3">
-              <a onClick={this.props.setView} className="text-secondary">{'< Back to catalog'}</a>
+              <a onClick={this.props.setView} className="text-secondary">{'< Back to Catalog'}</a>
             </div>
           </div>
           <div className="row">

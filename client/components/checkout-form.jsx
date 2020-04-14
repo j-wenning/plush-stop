@@ -22,10 +22,8 @@ export default class CheckoutForm extends React.Component {
 
   onValChange(e, prop) {
     const ct = e.currentTarget;
-    if (ct.value === ' ' || ct.value === '') {
-      ct.value = '';
-      this.setState({ [prop]: '' });
-    } else {
+    if (ct.value.trim() === '') ct.value = '';
+    else if (!this.state[prop] || ct.value.length > this.state[prop].length) {
       switch (prop) {
         case 'name':
           ct.value = ct.value.replace(/(\s\s)+/g, ' ').replace(/(\d|\B\W\W)+/g, '').substr(0, 64);
@@ -48,8 +46,8 @@ export default class CheckoutForm extends React.Component {
           console.error('invalid prop "', prop, '"');
           break;
       }
-      this.setState({ [prop]: ct.value.trim() || ct.value });
     }
+    this.setState({ [prop]: ct.value.trim() || ct.value });
   }
 
   onBlur(prop) {
@@ -102,7 +100,6 @@ export default class CheckoutForm extends React.Component {
     e.preventDefault();
     if (this.props.cart.length > 0) {
       this.props.placeOrder(order);
-      this.props.setView();
     } else alert('Your cart is empty!');
   }
 
@@ -219,7 +216,7 @@ export default class CheckoutForm extends React.Component {
           </div>
           <div className="row">
             <div className="col">
-              <a onClick={this.props.setView} className="text-secondary">{'< Continue Shopping'}</a>
+              <a onClick={this.props.viewCatalog} className="text-secondary">{'< Continue Shopping'}</a>
             </div>
             <div className="col text-right">
               <button className="btn btn-primary" type="submit" disabled={!enabled}>Place Order</button>
