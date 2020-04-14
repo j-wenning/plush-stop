@@ -2,7 +2,7 @@ import React from 'react';
 
 export default class CartSummaryItem extends React.Component {
   modifyItem(e) {
-    e.target.value = Math.max(Number(e.target.value), 1);
+    e.target.value = Math.min(Math.max(Number(e.target.value), 1), 99);
     this.props.modifyInCart(this.props.item.cartItemId, e.target.value);
   }
 
