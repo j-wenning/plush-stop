@@ -22,10 +22,8 @@ export default class CheckoutForm extends React.Component {
 
   onValChange(e, prop) {
     const ct = e.currentTarget;
-    if (ct.value === ' ' || ct.value === '') {
-      ct.value = '';
-      this.setState({ [prop]: '' });
-    } else {
+    if (ct.value.trim() === '') ct.value = '';
+    else if (!this.state[prop] || ct.value.length > this.state[prop].length) {
       switch (prop) {
         case 'name':
           ct.value = ct.value.replace(/(\s\s)+/g, ' ').replace(/(\d|\B\W\W)+/g, '').substr(0, 64);
@@ -48,8 +46,8 @@ export default class CheckoutForm extends React.Component {
           console.error('invalid prop "', prop, '"');
           break;
       }
-      this.setState({ [prop]: ct.value.trim() || ct.value });
     }
+    this.setState({ [prop]: ct.value.trim() || ct.value });
   }
 
   onBlur(prop) {
