@@ -17,16 +17,14 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 ALTER TABLE ONLY public."cartItems" DROP CONSTRAINT uc_productid;
-ALTER TABLE ONLY public.products DROP CONSTRAINT products_pkey;
 ALTER TABLE ONLY public.orders DROP CONSTRAINT orders_pkey;
 ALTER TABLE ONLY public.carts DROP CONSTRAINT carts_pkey;
 ALTER TABLE ONLY public."cartItems" DROP CONSTRAINT "cartItems_pkey";
-ALTER TABLE public.products ALTER COLUMN "productId" DROP DEFAULT;
 ALTER TABLE public.orders ALTER COLUMN "orderId" DROP DEFAULT;
 ALTER TABLE public.carts ALTER COLUMN "cartId" DROP DEFAULT;
 ALTER TABLE public."cartItems" ALTER COLUMN "cartItemId" DROP DEFAULT;
-DROP SEQUENCE public."products_productId_seq";
 DROP TABLE public.products;
+DROP SEQUENCE public."products_productId_seq";
 DROP SEQUENCE public."orders_orderId_seq";
 DROP TABLE public.orders;
 DROP SEQUENCE public."carts_cartId_seq";
@@ -164,20 +162,6 @@ ALTER SEQUENCE public."orders_orderId_seq" OWNED BY public.orders."orderId";
 
 
 --
--- Name: products; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.products (
-    "productId" integer NOT NULL,
-    name text NOT NULL,
-    price integer NOT NULL,
-    image text NOT NULL,
-    "shortDescription" text NOT NULL,
-    "longDescription" text NOT NULL
-);
-
-
---
 -- Name: products_productId_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -191,10 +175,18 @@ CREATE SEQUENCE public."products_productId_seq"
 
 
 --
--- Name: products_productId_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: products; Type: TABLE; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE public."products_productId_seq" OWNED BY public.products."productId";
+CREATE TABLE public.products (
+    "productId" integer DEFAULT nextval('public."products_productId_seq"'::regclass) NOT NULL,
+    name text NOT NULL,
+    price integer NOT NULL,
+    image text NOT NULL,
+    height integer NOT NULL,
+    width integer NOT NULL,
+    details text NOT NULL
+);
 
 
 --
@@ -216,13 +208,6 @@ ALTER TABLE ONLY public.carts ALTER COLUMN "cartId" SET DEFAULT nextval('public.
 --
 
 ALTER TABLE ONLY public.orders ALTER COLUMN "orderId" SET DEFAULT nextval('public."orders_orderId_seq"'::regclass);
-
-
---
--- Name: products productId; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.products ALTER COLUMN "productId" SET DEFAULT nextval('public."products_productId_seq"'::regclass);
 
 
 --
@@ -253,13 +238,19 @@ COPY public.orders ("orderId", "cartId", name, "creditCard", "shippingAddress", 
 -- Data for Name: products; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-COPY public.products ("productId", name, price, image, "shortDescription", "longDescription") FROM stdin;
-1	Shake Weight	2999	/images/shake-weight.jpg	Dynamic Inertia technology ignites muscles in arms, shoulders, and chest.	Lorem ipsum dolor amet fashion axe pour-over jianbing, adaptogen waistcoat tacos master cleanse pitchfork next level. Thundercats pour-over chartreuse 90's. Master cleanse hot chicken ennui offal. Freegan slow-carb offal hell of. Umami polaroid wolf slow-carb next level. Gentrify cardigan seitan, kombucha tacos chambray roof party typewriter man braid. Tote bag lo-fi hell of chia fam hammock\\n.Aesthetic photo booth la croix, vaporware leggings biodiesel man braid tumeric skateboard tousled slow-carb four dollar toast synth pabst pickled. Typewriter church-key chia slow-carb vice gochujang actually. Shoreditch austin woke hot chicken, single-origin coffee ugh affogato four loko green juice. Migas iPhone four dollar toast mustache.
-2	ShamWow	2595	/images/shamwow.jpg	It's like a chamois, towel, and sponge, all in one! Soaks up to 10x it's weight in any liquid!	Lorem ipsum dolor amet fashion axe pour-over jianbing, adaptogen waistcoat tacos master cleanse pitchfork next level. Thundercats pour-over chartreuse 90's. Master cleanse hot chicken ennui offal. Freegan slow-carb offal hell of. Umami polaroid wolf slow-carb next level. Gentrify cardigan seitan, kombucha tacos chambray roof party typewriter man braid. Tote bag lo-fi hell of chia fam hammock\\n.Aesthetic photo booth la croix, vaporware leggings biodiesel man braid tumeric skateboard tousled slow-carb four dollar toast synth pabst pickled. Typewriter church-key chia slow-carb vice gochujang actually. Shoreditch austin woke hot chicken, single-origin coffee ugh affogato four loko green juice. Migas iPhone four dollar toast mustache.
-3	Snuggie	2900	/images/snuggie.jpg	Super-Soft Fleece with pockets! One Size fits all Adults! Keeps you Warm & Your Hands-Free!	Lorem ipsum dolor amet fashion axe pour-over jianbing, adaptogen waistcoat tacos master cleanse pitchfork next level. Thundercats pour-over chartreuse 90's. Master cleanse hot chicken ennui offal. Freegan slow-carb offal hell of. Umami polaroid wolf slow-carb next level. Gentrify cardigan seitan, kombucha tacos chambray roof party typewriter man braid. Tote bag lo-fi hell of chia fam hammock\\n.Aesthetic photo booth la croix, vaporware leggings biodiesel man braid tumeric skateboard tousled slow-carb four dollar toast synth pabst pickled. Typewriter church-key chia slow-carb vice gochujang actually. Shoreditch austin woke hot chicken, single-origin coffee ugh affogato four loko green juice. Migas iPhone four dollar toast mustache.
-4	Wax Vac	999	/images/wax-vac.jpg	Gentle way to remove ear wax. Safe and hygienic. Reduces the risk of painful infections.	Lorem ipsum dolor amet fashion axe pour-over jianbing, adaptogen waistcoat tacos master cleanse pitchfork next level. Thundercats pour-over chartreuse 90's. Master cleanse hot chicken ennui offal. Freegan slow-carb offal hell of. Umami polaroid wolf slow-carb next level. Gentrify cardigan seitan, kombucha tacos chambray roof party typewriter man braid. Tote bag lo-fi hell of chia fam hammock\\n.Aesthetic photo booth la croix, vaporware leggings biodiesel man braid tumeric skateboard tousled slow-carb four dollar toast synth pabst pickled. Typewriter church-key chia slow-carb vice gochujang actually. Shoreditch austin woke hot chicken, single-origin coffee ugh affogato four loko green juice. Migas iPhone four dollar toast mustache.
-5	Ostrich Pillow	9900	/images/ostrich-pillow.jpg	Create your own snugly space in the world and feel-good anywhere with the ultimate cocoon pillow.	Lorem ipsum dolor amet fashion axe pour-over jianbing, adaptogen waistcoat tacos master cleanse pitchfork next level. Thundercats pour-over chartreuse 90's. Master cleanse hot chicken ennui offal. Freegan slow-carb offal hell of. Umami polaroid wolf slow-carb next level. Gentrify cardigan seitan, kombucha tacos chambray roof party typewriter man braid. Tote bag lo-fi hell of chia fam hammock\\n.Aesthetic photo booth la croix, vaporware leggings biodiesel man braid tumeric skateboard tousled slow-carb four dollar toast synth pabst pickled. Typewriter church-key chia slow-carb vice gochujang actually. Shoreditch austin woke hot chicken, single-origin coffee ugh affogato four loko green juice. Migas iPhone four dollar toast mustache.
-6	Tater Mitts	830	/images/tater-mitts.jpg	8 Seconds is all you need with Tater Mitts. Quickly and easily prepare all your favorite potato dishes with Tater Mitts.	Lorem ipsum dolor amet fashion axe pour-over jianbing, adaptogen waistcoat tacos master cleanse pitchfork next level. Thundercats pour-over chartreuse 90's. Master cleanse hot chicken ennui offal. Freegan slow-carb offal hell of. Umami polaroid wolf slow-carb next level. Gentrify cardigan seitan, kombucha tacos chambray roof party typewriter man braid. Tote bag lo-fi hell of chia fam hammock\\n.Aesthetic photo booth la croix, vaporware leggings biodiesel man braid tumeric skateboard tousled slow-carb four dollar toast synth pabst pickled. Typewriter church-key chia slow-carb vice gochujang actually. Shoreditch austin woke hot chicken, single-origin coffee ugh affogato four loko green juice. Migas iPhone four dollar toast mustache.
+COPY public.products ("productId", name, price, image, height, width, details) FROM stdin;
+1	Cat	2999	./images/cat.jpg	40	45	95% cotton\\n5% polyester
+2	Corgi	1499	./images/corgi.jpg	20	12	100% cotton
+3	Deer	1499	./images/deer.jpg	20	12	100% cotton
+4	Dolphin	1499	./images/dolphin.jpg	15	15	50% cotton\\n50% polyester
+5	Duck	1999	./images/duck.jpg	17	12	75% cotton\\n15% polyester
+6	Elephant	2999	./images/elephant.jpg	35	45	95% cotton\\n5% polyester
+7	Narwhal	2999	./images/narwhal.jpg	35	45	95% cotton\\n5% polyester
+8	Owl	999	./images/owl.jpg	10	10	100% polyester
+9	Panda	1999	./images/panda.jpg	20	25	90% cotton\\n10% polyester
+10	Pig	2999	./images/pig.jpg	30	50	90% cotton\\n10% polyester
+11	Seal	2999	./images/seal.jpg	30	50	85% cotton\\n15% polyester
+12	Shiba Inu	2999	./images/shiba-inu.jpg	35	45	90% cotton\\n10% polyester
 \.
 
 
@@ -288,7 +279,7 @@ SELECT pg_catalog.setval('public."orders_orderId_seq"', 1, false);
 -- Name: products_productId_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public."products_productId_seq"', 1, false);
+SELECT pg_catalog.setval('public."products_productId_seq"', 12, true);
 
 
 --
@@ -313,14 +304,6 @@ ALTER TABLE ONLY public.carts
 
 ALTER TABLE ONLY public.orders
     ADD CONSTRAINT orders_pkey PRIMARY KEY ("orderId");
-
-
---
--- Name: products products_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.products
-    ADD CONSTRAINT products_pkey PRIMARY KEY ("productId");
 
 
 --
