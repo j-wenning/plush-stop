@@ -32,7 +32,9 @@ app.get('/api/products', (req, res, next) => {
            "name",
            "price",
            "image",
-           "shortDescription"
+           "height",
+           "width",
+           "details"
       FROM "products";
   `).then(result => res.json(result.rows))
     .catch(err => next(err));
@@ -88,7 +90,9 @@ app.post('/api/cart', (req, res, next) => {
                "p"."productId",
                "p"."image",
                "p"."name",
-               "p"."shortDescription"
+               "p"."height",
+               "p"."width",
+               "p"."details"
           FROM "inserted_row" AS "c"
           JOIN "products" AS "p" USING ("productId");
       `, [cid, pid]);
@@ -110,7 +114,9 @@ app.get('/api/cart', (req, res, next) => {
              "p"."productId",
              "p"."image",
              "p"."name",
-             "p"."shortDescription"
+             "p"."height",
+             "p"."width",
+             "p"."details"
         FROM "cartItems" AS "c"
         JOIN "products" AS "p" USING ("productId")
        WHERE "cartId" = $1;
@@ -143,7 +149,9 @@ app.patch('/api/cart', (req, res, next) => {
          "p"."productId",
          "p"."image",
          "p"."name",
-         "p"."shortDescription"
+         "p"."height",
+         "p"."width",
+         "p"."details"
     FROM "updated_row" AS "c"
     JOIN "products" AS "p" USING("productId");
   `, [qty, cid, ciid])
