@@ -121,7 +121,8 @@ export default class App extends React.Component {
       case 'catalog':
       case 'catalogue':
         view = <ProductList
-          setView={params => this.setView('details', params)}/>;
+          setView={params => this.setView('details', params)}
+          addToCart={productId => this.addToCart(productId)}/>;
         break;
       case 'details':
         view = <ProductDetails
