@@ -28,14 +28,15 @@ app.get('/api/visit-check', (req, res, next) => {
 
 app.get('/api/products', (req, res, next) => {
   db.query(`
-    SELECT "productId",
-           "name",
-           "price",
-           "image",
-           "height",
-           "width",
-           "details"
-      FROM "products";
+      SELECT "productId",
+             "name",
+             "price",
+             "image",
+             "height",
+             "width",
+             "details"
+        FROM "products"
+    ORDER BY "name";
   `).then(result => res.json(result.rows))
     .catch(err => next(err));
 });
