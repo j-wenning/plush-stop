@@ -3,11 +3,16 @@ import React from 'react';
 export default class Header extends React.Component {
   render() {
     return (
-      <div className="navbar navbar-dark bg-dark mb-4">
+      <div className="navbar navbar-light bg-warning mb-4">
         <a href="" className="navbar-brand col">
-          <h2 className="col-12 col-sm">
-            <i className="fas fa-dollar-sign" /> Wicked Sales
-          </h2>
+          <img
+            src="./images/favicon.png"
+            width="50"
+            height="50"
+            style={{ filter: 'invert(100%)' }}
+            alt=""
+            className="d-none d-sm-inline-block align-text-bottom" />
+          <h2 className="col-11 d-inline-block align-text-bottom">Plush Stop</h2>
         </a>
         <a onClick={this.props.setView} className="col-12 col-sm">
           <h2 className="col navbar-text text-sm-right">
