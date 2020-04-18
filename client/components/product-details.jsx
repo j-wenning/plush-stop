@@ -22,6 +22,9 @@ export default class ProductDetails extends React.Component {
 
   render() {
     if (!this.state.product) return '';
+    const details = this.state.product.details.split('\\n').map((item, index) => (
+      <li key={index}>{item}</li>
+    ));
     return (
       <div className="container product-details">
         <div className="card p-4">
@@ -31,20 +34,24 @@ export default class ProductDetails extends React.Component {
             </div>
           </div>
           <div className="row">
-            <img src={this.state.product.image} className="img-fluid col-5" alt=""/>
-            <div className="col-7">
+            <img src={this.state.product.image} className="img-fluid col-md-5" alt=""/>
+            <div className="col-md-7 pl-md-5">
               <h2>{this.state.product.name}</h2>
               <h3 className="text-secondary">${(this.state.product.price / 100).toFixed(2)}</h3>
-              <p>{this.state.product.shortDescription}</p>
               <button
                 type="button"
                 onClick={() => this.props.addToCart(this.props.productId)}
-                className="btn btn-primary">Add to Cart</button>
+                className="btn btn-primary mt-4">Add to Cart</button>
+              <h4 className="mt-4">Product Details</h4>
+              <ul>
+                <li>{`${this.state.product.height}" x ${this.state.product.width}"`}</li>
+                {details}
+              </ul>
             </div>
           </div>
           <div className="row">
             <div className="col">
-              <p>{this.state.product.longDescription}</p>
+
             </div>
           </div>
         </div>
