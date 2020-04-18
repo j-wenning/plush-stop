@@ -28,7 +28,8 @@ export default class ProductList extends React.Component {
         product={p}
         setView={() => this.props.setView({
           productId: p.productId
-        })}/>
+        })}
+        addToCart={() => this.props.addToCart(p.productId)}/>
     );
     return (
       <div className="m-auto container row row-cols-1 row-cols-sm-2 row-cols-md-3 product-list">
