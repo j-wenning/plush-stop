@@ -72,13 +72,11 @@ export default class CartSummary extends React.Component {
             <h2>My Cart</h2>
           </div>
         </div>
-        <div className="row">
-          <div className="col card-columns">
-            {
-              items.length
-                ? items : <p>Your cart is empty.</p>
-            }
-          </div>
+        <div className="row row-cols-1">
+          {
+            items.length
+              ? items : <p>Your cart is empty.</p>
+          }
         </div>
         {
           this.props.cart.length > 0 &&
