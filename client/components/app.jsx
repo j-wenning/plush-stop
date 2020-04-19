@@ -162,7 +162,8 @@ export default class App extends React.Component {
             this.state.visitCount < 5 && <Notice />
           }
           <Header
-            setView={() => this.setView('cart', {})}
+            viewCatalog={() => this.setView('catalog', {})}
+            viewCart={() => this.setView('cart', {})}
             cartItemCount={this.state.cart.reduce((a, b) => a + b.quantity, 0)}/>
           {
             this.state.error
