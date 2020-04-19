@@ -1,6 +1,6 @@
-# Wicked Sales
+# Plush Stop
 
-A full stack Content Management System (CMS) web application for consumers who want to buy novelty items.
+A full stack Content Management System (CMS) web application for consumers who want to purchase stuffed animals.
 
 ## Technologies Used
 
