@@ -21,6 +21,7 @@ Try the application live at https://wicked-sales.jwenning.digital.
 ## Features
 
 - Guest can view product catalogue
+- Guest can sort product catalogue
 - Guest can view product details
 - Guest can add product to cart
 - Guest can view cart
