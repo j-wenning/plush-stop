@@ -9,7 +9,7 @@ export default class ProductListItem extends React.Component {
   render() {
     return (
       <div className="col mb-4 product-list-item">
-        <div onClick={this.props.setView} className="card">
+        <div onClick={this.props.viewDetails} className="card">
           <img src={this.props.product.image} className="mt-1 card-img-top img-fluid" alt=""/>
           <div className="card-body">
             <div className="row no-gutters">
