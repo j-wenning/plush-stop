@@ -169,6 +169,7 @@ export default class App extends React.Component {
             this.state.error
               ? <h2>{this.state.error}</h2> : view
           }
+          <footer className="m-5 p-5"/>
         </div>
       );
   }
