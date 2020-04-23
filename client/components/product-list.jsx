@@ -54,7 +54,7 @@ export default class ProductList extends React.Component {
       p => <ProductListItem
         key={p.productId}
         product={p}
-        setView={() => this.props.setView({
+        viewDetails={() => this.props.viewDetails({
           productId: p.productId
         })}
         addToCart={() => this.props.addToCart(p.productId)}/>

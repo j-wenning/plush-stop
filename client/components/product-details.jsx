@@ -1,9 +1,15 @@
 import React from 'react';
+import ConfirmationModal from './confirmation-modal';
 
 export default class ProductDetails extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { error: false, message: '', product: null };
+    this.state = {
+      error: false,
+      message: '',
+      product: null,
+      added: false
+    };
   }
 
   getProduct(id) {
@@ -14,6 +20,11 @@ export default class ProductDetails extends React.Component {
         error: true,
         message: err
       }));
+  }
+
+  addProduct(id) {
+    this.props.addToCart(id);
+    this.setState({ added: true });
   }
 
   componentDidMount() {
@@ -27,10 +38,23 @@ export default class ProductDetails extends React.Component {
     ));
     return (
       <div className="container product-details">
+        {
+          this.state.added && <ConfirmationModal
+            primaryText={'This item has been added to your cart.'}
+            primaryAction={{
+              action: this.props.viewCart,
+              text: 'view cart'
+            }}
+            secondaryAction={{
+              action: this.props.viewCatalog,
+              text: 'back to shopping'
+            }}
+            close={() => this.setState({ added: false })} />
+        }
         <div className="card p-4">
           <div className="row">
             <div className="col mb-3">
-              <a onClick={this.props.setView} className="text-secondary">{'< Back to Catalog'}</a>
+              <a onClick={this.props.viewCatalog} className="text-secondary">{'< Back to Catalog'}</a>
             </div>
           </div>
           <div className="row">
@@ -40,7 +64,7 @@ export default class ProductDetails extends React.Component {
               <h3 className="text-secondary">${(this.state.product.price / 100).toFixed(2)}</h3>
               <button
                 type="button"
-                onClick={() => this.props.addToCart(this.props.productId)}
+                onClick={() => this.addProduct(this.props.productId)}
                 className="btn btn-primary mt-4">Add to Cart</button>
               <h4 className="mt-4">Product Details</h4>
               <ul>
@@ -49,14 +73,8 @@ export default class ProductDetails extends React.Component {
               </ul>
             </div>
           </div>
-          <div className="row">
-            <div className="col">
-
-            </div>
-          </div>
         </div>
       </div>
-
     );
   }
 }

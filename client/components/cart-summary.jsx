@@ -1,5 +1,6 @@
 import React from 'react';
 import CartSummaryItem from './cart-summary-item';
+import ConfirmationModal from './confirmation-modal';
 
 export default class CartSummary extends React.Component {
   constructor(props) {
@@ -26,41 +27,21 @@ export default class CartSummary extends React.Component {
     return (
       <div className="container cart-summary">
         {
-          <div
-            className="modal"
-            style={{ display: this.state.removing ? 'block' : 'none' }}>
-            <div className="modal-dialog">
-              <div className="modal-content">
-                <div className="modal-header">
-                  <h5 className="modal-title">Are you sure you want to remove this item?</h5>
-                  <button
-                    type="button"
-                    className="close"
-                    onClick={() => this.setState({ removing: null })}>
-                    <span>&times;</span>
-                  </button>
-                </div>
-                <div className="modal-footer">
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    data-dismiss="modal"
-                    onClick={() => this.setState({ removing: null })}>
-                      Cancel
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-danger"
-                    onClick={() => {
-                      this.setState({ removing: null });
-                      this.props.removeFromCart(this.state.removing);
-                    }}>
-                      Remove
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
+          this.state.removing && <ConfirmationModal
+            primaryText={'Are you sure you want to remove this item?'}
+            primaryAction={{
+              action: () => {
+                this.setState({ removing: null });
+                this.props.removeFromCart(this.state.removing);
+              },
+              text: 'remove',
+              color: 'btn-danger'
+            }}
+            secondaryAction={{
+              action: () => this.setState({ removing: null }),
+              text: 'cancel'
+            }}
+            close={() => this.setState({ removing: null })}/>
         }
         <div className="row">
           <div className="col mb-3">
