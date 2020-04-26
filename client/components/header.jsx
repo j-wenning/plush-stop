@@ -21,9 +21,9 @@ export default class Header extends React.Component {
             <h2 className="col-12">
               {this.props.cartItemCount}
               <span className="d-none d-sm-inline">
-                items
+                {' items '}
               </span>
-              <i className="fas fa-shopping-cart" />
+              <i className="fas fa-shopping-cart"/>
             </h2>
           </a>
         </div>
